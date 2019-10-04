@@ -1,0 +1,20 @@
+nn is proved to be twice as accurate as the regression model (Tay and Ho, 1992) & (Do adn Grudnitski, 1992)
+
+Worzala et al (1995) says the opposite thing: did not prove to be significantly better than the statistical apporach
+
+Jenkin et al (1999): use the SOM for stratification of the data set. -> use it to uncover submarkets and construct independent MLP networks for each dataset. 
+
+self-organising map: 
+- mapping from a high-dimensional data spae onto a usual two-dimensional lattice of points. 
+
+steps: 
+- init: random value for each node 
+- select training vector x 
+- find the best matching neuron node c (based on minimising educlidian distance)
+- adjust the node c towards the obs x
+
+competitive learning
+SOM seperate the market into sub-market and build independent MLP networks for each sub-market
+
+
+http://www.cs.bham.ac.uk/~jxb/NN/l16.pdf

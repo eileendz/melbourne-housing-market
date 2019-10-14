@@ -1,0 +1,70 @@
+---
+title: "Forecasting Melbourne House Prices"
+subtitle: "ETC3555: Project"
+author: "Eileen Dzhumasheva, Jack Cameron, Sherry Zhang"
+date: "17/05/2019"
+output:
+  xaringan::moon_reader:
+    css: ["default", "default-fonts"]
+    lib_dir: libs
+---
+
+```{r setup, include=FALSE}
+options(htmltools.dir.version = FALSE)
+knitr::opts_chunk$set(warning = FALSE, message = FALSE, 
+  comment = NA, dpi = 300, echo = FALSE,
+  fig.align = "center", out.width = "80%", cache = FALSE)
+library(tidyverse)
+library(wesanderson)
+```
+
+---
+
+class: inverse, middle, center
+
+# Introduction
+
+---
+
+# Predicting Melbourne House prices
+
+---
+
+
+class: inverse, middle, center
+
+# 1. Model
+
+---
+
+
+class: inverse, middle, center
+
+# 2. Experiment
+
+---
+
+# Loss Function
+
+---
+
+class: inverse, middle, center
+
+# 3. Results and Discussion
+
+
+---
+
+class: inverse, middle, center
+
+# 4. Conclusion
+
+---
+
+class: inverse, middle, center
+
+# Thank you!
+
+
+
+

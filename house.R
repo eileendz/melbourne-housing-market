@@ -19,9 +19,17 @@ house_less<- read_csv("data/MELBOURNE_HOUSE_PRICES_LESS.csv") %>%
   # dont think seller would affect house price so not included
   select(-c(address, seller_g, propertycount, regionname)) %>% 
   # drop the observation if no price information
-  filter(!is.na(price)) %>% 
-  # assign category (1-10) to price based on quantile. 
-  mutate(price_class = as_factor(findInterval(price, quantile(price, probs=1:10/10), all.inside = TRUE))) %>% 
+  filter(!is.na(price)) 
+
+# the data is right skewed! 
+house_less %>% ggplot(aes(x = price)) + geom_histogram()
+
+house_c <- house_less %>% 
+  # assign category (1-10) to price based on range (0, 100], (100, 300], (300, 500] ... (1500, 1700], (1700, $\infty$)
+  # notice that the price in this thousand dollars - see line 17
+# quantile(house_less$price,probs = seq(0, 1, 0.1))
+# c(0, seq(1e2, 18e2, 2e2), max(house_less$price)) # notice inbalanced data - thus using loss function rather than accuracy as measuring criteria
+  mutate(price_class = cut(house_less$price, breaks = c(0, seq(1e2, 18e2, 2e2), max(house_less$price)), label = FALSE)) %>% 
   select(-c(price, suburb, date)) # suburb and postcode are giving the same information maybe take only one?
 
 # Then our problem can be re-phrased into: predict which category will the price 
@@ -33,7 +41,7 @@ house_less<- read_csv("data/MELBOURNE_HOUSE_PRICES_LESS.csv") %>%
 
 # resampling: train test  split: 0.9, 0.1
 set.seed(92472)
-house_split <- initial_split(house_less, prop = 0.9)  
+house_split <- initial_split(house_c, prop = 0.9)  
 train <- house_split %>% training()
 test <- house_split %>% testing()
 
@@ -87,6 +95,9 @@ model <- keras_model_sequential() %>%
   layer_batch_normalization() %>% 
   layer_dropout(rate = FLAGS$dropout) %>% 
   layer_dense(units = FLAGS$dense_unit2, activation = FLAGS$activation) %>% 
+  layer_batch_normalization() %>% 
+  layer_dropout(rate = FLAGS$dropout) %>% 
+  layer_dense(units = FLAGS$dense_unit3, activation = FLAGS$activation) %>% 
   layer_batch_normalization() %>% 
   layer_dropout(rate = FLAGS$dropout) %>% 
   layer_dense(units = 10, activation = "softmax") %>% 

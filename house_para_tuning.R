@@ -2,11 +2,12 @@ library(tfruns)
 
 runs <- tuning_run("house.R", flags = list(
   dense_unit1 = c(2048, 1024, 512), #c(512, 256, 128, 64)
-  dense_unit2 = c(256, 128, 64, 32), 
-  dropout = c(0.2), # dropout rate of 0.2 seems to be better than 0.4
+  dense_unit2 = c(1024, 512, 64, 32), 
+  dense_unit3 = c(512, 256, 64, 32), 
+  dropout = c(0, 0.1, 0.2), # dropout rate of 0.2 seems to be better than 0.4
   learning_rate = c(1e-3, 1e-4, 1e-5), # could try if 1e-4 or 1e-5 would work better but need more epoch
   batch_size = c(64, 128, 256, 512), # c(16, 32, 64)
-  activation = c("relu", "tanh")
+  activation = c("relu", "tanh", "LeakyReLU")
 ))
 
 # runs <- tuning_run("house.R", flags = list(

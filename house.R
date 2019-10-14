@@ -68,61 +68,76 @@ test_y <- to_categorical(pull(test, price_class), 10)
 # metrics: accuracy
 
 FLAGS <- flags(
-  flag_integer("dense_unit1", 64),
-  flag_numeric("dropout", 0.4), 
-  flag_integer("dense_unit2", 128), 
-  flag_numeric("learning_rate", 0.001), 
-  flag_integer("epoch", 30), 
-  flag_integer("batch_size", 32)
+  flag_integer("dense_unit1", 128),
+  flag_numeric("dropout", 0.2), 
+  flag_integer("dense_unit2", 64), 
+  flag_numeric("learning_rate", 1e4), 
+  flag_integer("epoch", 500), 
+  flag_integer("batch_size", 32), 
+  flag_string("activation", "relu")
 )
+early_stop <- callback_early_stopping(monitor = "val_loss", patience = 20,
+                                      restore_best_weights = TRUE)
+
 
 k_clear_session()
 model <- keras_model_sequential() %>% 
   layer_dropout(rate = FLAGS$dropout) %>% 
-  layer_dense(units = FLAGS$dense_unit1, activation = "relu", input_shape = 277) %>%  # input_shape is the dimension of the input EXCLUDING THE SAMPLE AXIS!and dont put c(277) - for some reason it doesnt work!
+  layer_dense(units = FLAGS$dense_unit1, activation = FLAGS$activation, input_shape = 277) %>%  # input_shape is the dimension of the input EXCLUDING THE SAMPLE AXIS!and dont put c(277) - for some reason it doesnt work!
   layer_batch_normalization() %>% 
   layer_dropout(rate = FLAGS$dropout) %>% 
-  layer_dense(units = FLAGS$dense_unit2, activation = "relu") %>% 
+  layer_dense(units = FLAGS$dense_unit2, activation = FLAGS$activation) %>% 
   layer_batch_normalization() %>% 
   layer_dropout(rate = FLAGS$dropout) %>% 
   layer_dense(units = 10, activation = "softmax") %>% 
-  compile(optimizer = optimizer_rmsprop(FLAGS$learning_rate), 
+  compile(optimizer = optimizer_adam(FLAGS$learning_rate), 
           loss = "categorical_crossentropy", 
           metrics = "acc")
 
 # parameter tuning via cross validation
 
 # cross validation
-k <- 3 # could use 5 or 10 tho takes more time 
-set.seed(92472)
-ind <- sample(1: nrow(train_x))
-fold <- cut(ind, breaks = k, label = FALSE)
-score <- c()
+# k <- 3 # could use 5 or 10 tho takes more time 
+# set.seed(92472)
+# ind <- sample(1: nrow(train_x))
+# fold <- cut(ind, breaks = k, label = FALSE)
+# score <- c()
+# 
+# cv_function <- function(i){
+#   result <- tibble::as_tibble()
+#   epoch_num <-  FLAGS$epoch
+#   val_ind <- which(fold == i)
+#   validation_x <- train_x[val_ind,] 
+#   validation_y <- train_y[val_ind,]
+#   train_x_cv <- train_x[-val_ind,]
+#   train_y_cv <- train_y[-val_ind,]
+#   
+#   history <- model %>% fit(train_x_cv, train_y_cv, 
+#                            validation_adta = list(validation_x, validation_y), 
+#                            epoch =epoch_num , batch_size = FLAGS$batch_size)
+#   
+#   ind_result <- result %>% bind_rows(tibble::as_tibble(history))
+#   return(ind_result)
+# }
+# 
+# cv_result <- map_df(1:k, cv_function)
+# 
+# cv_result_tidy <- cv_result %>% filter(epoch == 2) %>% 
+#   group_by(metric) %>% 
+#   summarise(accuracy = mean(value))
 
-cv_function <- function(i){
-  result <- tibble::as_tibble()
-  epoch_num <-  FLAGS$epoch
-  val_ind <- which(fold == i)
-  validation_x <- train_x[val_ind,] 
-  validation_y <- train_y[val_ind,]
-  train_x_cv <- train_x[-val_ind,]
-  train_y_cv <- train_y[-val_ind,]
-  
-  history <- model %>% fit(train_x_cv, train_y_cv, 
-                           validation_adta = list(validation_x, validation_y), 
-                           epoch =epoch_num , batch_size = FLAGS$batch_size)
-  
-  ind_result <- result %>% bind_rows(tibble::as_tibble(history))
-  return(ind_result)
-}
+# val_ind <- sample(1:nrow(train_x),size = floor(0.9*nrow(train_x))) # thus 0.81 as training, 0.9 as validation, 10% as testing
+# x_validation <- train_x[val_ind,] 
+# y_validation <- train_y[val_ind,]
+# x_train <- train_x[-val_ind,]
+# y_train <- train_y[-val_ind,]
 
-cv_result <- map_df(1:k, cv_function)
+history <- model %>% fit(x_train, y_train,
+                         validation_split = 0.2,
+                         epoch =FLAGS$epoch , batch_size = FLAGS$batch_size,
+                         callbacks = early_stop)
 
-cv_result_tidy <- cv_result %>% filter(epoch == 2) %>% 
-  group_by(metric) %>% 
-  summarise(accuracy = mean(value))
-
-
+ind_result <- tibble::as_tibble(history$metrics)
 
 
 

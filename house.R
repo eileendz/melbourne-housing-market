@@ -55,9 +55,9 @@ rec_obj <- train %>%
 
 train_x <- bake(rec_obj,new_data = train) %>% select(-price_class) 
 train_x <- train_x %>% as.matrix()
-train_y <- to_categorical(pull(train, price_class), 10)
+train_y <- to_categorical(pull(train, price_class)-1, 10)
 test_x <- bake(rec_obj, new_data = test) %>% select(-price_class)
-test_y <- to_categorical(pull(test, price_class), 10)
+test_y <- to_categorical(pull(test, price_class)-1, 10)
 
 # NN model
 # dont really find a pre-trained architecture for house price forcasting, although there are articles on using ANN to predict
@@ -76,30 +76,29 @@ test_y <- to_categorical(pull(test, price_class), 10)
 # metrics: accuracy
 
 FLAGS <- flags(
-  flag_integer("dense_unit1", 128),
+  flag_integer("dense_unit1", 1024),
   flag_numeric("dropout", 0.2), 
-  flag_integer("dense_unit2", 64), 
+  flag_integer("dense_unit2", 512),
+  flag_integer("dense_unit3", 128),
   flag_numeric("learning_rate", 1e4), 
   flag_integer("epoch", 500), 
   flag_integer("batch_size", 32), 
   flag_string("activation", "relu")
 )
-early_stop <- callback_early_stopping(monitor = "val_loss", patience = 20,
-                                      restore_best_weights = TRUE)
+early_stop <- callback_early_stopping(monitor = "val_loss", patience = 5) #restore_best_weights = TRUE
 
 
 k_clear_session()
 model <- keras_model_sequential() %>% 
-  layer_dropout(rate = FLAGS$dropout) %>% 
   layer_dense(units = FLAGS$dense_unit1, activation = FLAGS$activation, input_shape = 277) %>%  # input_shape is the dimension of the input EXCLUDING THE SAMPLE AXIS!and dont put c(277) - for some reason it doesnt work!
-  layer_batch_normalization() %>% 
   layer_dropout(rate = FLAGS$dropout) %>% 
+  layer_batch_normalization() %>% 
   layer_dense(units = FLAGS$dense_unit2, activation = FLAGS$activation) %>% 
-  layer_batch_normalization() %>% 
   layer_dropout(rate = FLAGS$dropout) %>% 
+  layer_batch_normalization() %>% 
   layer_dense(units = FLAGS$dense_unit3, activation = FLAGS$activation) %>% 
-  layer_batch_normalization() %>% 
   layer_dropout(rate = FLAGS$dropout) %>% 
+  layer_batch_normalization() %>% 
   layer_dense(units = 10, activation = "softmax") %>% 
   compile(optimizer = optimizer_adam(FLAGS$learning_rate), 
           loss = "categorical_crossentropy", 
@@ -143,8 +142,8 @@ model <- keras_model_sequential() %>%
 # x_train <- train_x[-val_ind,]
 # y_train <- train_y[-val_ind,]
 
-history <- model %>% fit(x_train, y_train,
-                         validation_split = 0.2,
+history <- model %>% fit(train_x, train_y,
+                         validation_split = 0.3,
                          epoch =FLAGS$epoch , batch_size = FLAGS$batch_size,
                          callbacks = early_stop)
 

@@ -1,0 +1,67 @@
+
+> library(tidyverse)
+
+> library(keras)
+
+> library(rsample)
+
+> library(recipes)
+
+> # load data & cleaning
+> house_less<- read_csv("data/MELBOURNE_HOUSE_PRICES_LESS.csv") %>% 
++   janitor::clean_names() %>% 
++   mutate(suburb = as_f .... [TRUNCATED] 
+
+> # the data is right skewed! 
+> house_less %>% ggplot(aes(x = price)) + geom_histogram()
+
+> house_c <- house_less %>% 
++   # assign category (1-10) to price based on range (0, 100], (100, 300], (300, 500] ... (1500, 1700], (1700, $\infty$)
+ .... [TRUNCATED] 
+
+> # Then our problem can be re-phrased into: predict which category will the price 
+> # falls into, which is a classification problem!
+> 
+> # no missi .... [TRUNCATED] 
+
+> house_split <- initial_split(house_c, prop = 0.9)  
+
+> train <- house_split %>% training()
+
+> test <- house_split %>% testing()
+
+> # pre-processing data 
+> rec_obj <- train %>% 
++   recipe(price_class ~.) %>% 
++   step_center(all_numeric(),-all_outcomes()) %>% 
++   step_scale(al .... [TRUNCATED] 
+
+> train_x <- bake(rec_obj,new_data = train) %>% select(-price_class) 
+
+> train_x <- train_x %>% as.matrix()
+
+> train_y <- to_categorical(pull(train, price_class)-1, 10)
+
+> test_x <- bake(rec_obj, new_data = test) %>% select(-price_class)
+
+> test_y <- to_categorical(pull(test, price_class)-1, 10)
+
+> # NN model
+> # dont really find a pre-trained architecture for house price forcasting, although there are articles on using ANN to predict
+> # thus  .... [TRUNCATED] 
+
+> early_stop <- callback_early_stopping(monitor = "val_loss", patience = 20,
++                                       restore_best_weights = TRUE)
+
+> k_clear_session()
+
+> model <- keras_model_sequential() %>% 
++   layer_dropout(rate = FLAGS$dropout) %>% 
++   layer_dense(units = FLAGS$dense_unit1, activation = FLAGS$ac .... [TRUNCATED] 
+
+> # parameter tuning via cross validation
+> 
+> # cross validation
+> # k <- 3 # could use 5 or 10 tho takes more time 
+> # set.seed(92472)
+> # ind <- s .... [TRUNCATED] 

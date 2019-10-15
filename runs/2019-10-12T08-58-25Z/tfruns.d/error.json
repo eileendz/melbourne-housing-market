@@ -1,0 +1,4 @@
+{
+  "message": "house.R:95:1: unexpected symbol\n94: \n95: k\n    ^",
+  "traceback": "tuning_run(\"house.R\", flags = list(dropout = c(0.2, 0.4), epoch = c(2, \n    5), batch_size = c(10, 20)))"
+}

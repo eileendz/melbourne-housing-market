@@ -1,0 +1,8 @@
+{
+  "dense_unit1": 128,
+  "dropout": 0.2,
+  "dense_unit2": 128,
+  "learning_rate": 0.001,
+  "epoch": 50,
+  "batch_size": 32
+}

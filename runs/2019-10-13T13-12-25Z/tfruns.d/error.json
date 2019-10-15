@@ -1,0 +1,4 @@
+{
+  "message": "could not find function \"norw\"",
+  "traceback": ["sample(1:norw(train_x), replace = TRUE, prob = 0.9)", "eval(ei, envir)", "eval(ei, envir)", "withVisible(eval(ei, envir))", "tuning_run(\"house.R\", flags = list(dropout = c(0.2), learning_rate = c(0.001), \n    epoch = c(5), batch_size = c(20)))"]
+}

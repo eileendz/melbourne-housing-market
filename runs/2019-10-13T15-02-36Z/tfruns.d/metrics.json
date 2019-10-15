@@ -1,0 +1,6 @@
+{
+  "loss": [2.746, 2.2614, 2.1339, 1.9956, 1.9686, 1.9195, 1.8896, 1.8704, 1.8395, 1.8347, 1.831, 1.8345, 1.8149, 1.8187, 1.8099, 1.8061, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null],
+  "acc": [0.1494, 0.22, 0.2426, 0.2716, 0.2739, 0.2882, 0.3017, 0.3051, 0.3106, 0.3149, 0.3143, 0.3175, 0.3126, 0.3243, 0.3189, 0.3272, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null],
+  "val_loss": [2.1728, 1.8792, 1.7758, 1.7295, 1.7081, 1.6906, 1.6843, 1.672, 1.6627, 1.6548, 1.6437, 1.6404, 1.6478, 1.62, 1.6383, 1.6333, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null],
+  "val_acc": [0.2385, 0.3314, 0.3498, 0.3463, 0.3601, 0.3704, 0.3807, 0.3761, 0.383, 0.3693, 0.383, 0.383, 0.3876, 0.3933, 0.3773, 0.4037, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null]
+}

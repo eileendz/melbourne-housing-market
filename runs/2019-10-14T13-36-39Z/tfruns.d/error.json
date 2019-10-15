@@ -1,0 +1,4 @@
+{
+  "message": "The following flags were provided but not declared: dense_unit3",
+  "traceback": ["stop(\"The following flags were provided but not declared: \", \n    paste(undeclared, collapse = \", \"), call. = FALSE)", "parse_flags(FLAGS, config, file, arguments)", "flags(flag_integer(\"dense_unit1\", 128), flag_numeric(\"dropout\", \n    0.2), flag_integer(\"dense_unit2\", 64), flag_numeric(\"learning_rate\", \n    10000), flag_integer(\"epoch\", 500), flag_integer(\"batch_size\", \n    32), flag_string(\"activation\", \"relu\"))", "eval(ei, envir)", "eval(ei, envir)", "withVisible(eval(ei, envir))", "tuning_run(\"house.R\", flags = list(dense_unit1 = c(2048, 1024, \n    512), dense_unit2 = c(1024, 512, 64, 32), dense_unit3 = c(512, \n    256, 64, 32), dropout = c(0, 0.2), learning_rate = c(0.001, \n    1e-04, 1e-05), batch_size = c(64, 128, 256, 512), activation = c(\"relu\", \n    \"tanh\")))"]
+}

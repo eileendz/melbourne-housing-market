@@ -79,7 +79,6 @@ FLAGS <- flags(
   flag_integer("dense_unit1", 512),
   flag_numeric("dropout", 0.2), 
   flag_integer("dense_unit2", 256),
-  flag_integer("dense_unit3", 128),
   flag_numeric("learning_rate", 1e4), 
   flag_integer("epoch", 500), 
   flag_integer("batch_size", 32), 
@@ -95,9 +94,6 @@ model <- keras_model_sequential() %>%
   layer_dropout(rate = FLAGS$dropout) %>% 
   layer_batch_normalization() %>% 
   layer_dense(units = FLAGS$dense_unit2, activation = FLAGS$activation) %>% 
-  layer_dropout(rate = FLAGS$dropout) %>% 
-  layer_batch_normalization() %>% 
-  layer_dense(units = FLAGS$dense_unit3, activation = FLAGS$activation) %>% 
   layer_dropout(rate = FLAGS$dropout) %>% 
   layer_batch_normalization() %>% 
   layer_dense(units = 10, activation = "softmax") %>% 

@@ -8,7 +8,7 @@ output: pdf_document
 
 # Introduction
 
-In this project, we have been given a data set of all sold houses from March 2016 to December 2018 in Melbourne, detailing the sale price and a number of characteristics of the house. Our goal is to use this information, to predict the sale price of a house. The dataset contains information on 63,013 house sales scraped from publicly available results posted every week from Domain.com.au. The dataset includes variables that detail the suburb, adress, rooms, type of real estate, price, method of selling, seller, date, postcode, region, propertycount, distance from the CBD and council area. The dependent continous variable, y, defines the sale price of the house in AUD. Further details about the data set as well as some preliminary analysis are included in Appendix.
+In this project, we have been given a data set of all sold houses from March 2016 to December 2018 in Melbourne, detailing the sale price and a number of characteristics of the house. Our goal is to use this information, to predict the sale price of a house. The dataset contains information on 63,013 house sales scraped from publicly available results posted every week from Domain.com.au. The dataset includes variables that detail the suburb, address, rooms, type of real estate, price, method of selling, seller, date, postcode, region, property count, distance from the CBD and council area. The dependent continuous variable, y, defines the sale price of the house in AUD. Further details about the data set as well as some preliminary analysis are included in Appendix.
 
 ```{r set-options, include=FALSE}
 knitr::opts_chunk$set(warning = FALSE, message = FALSE, 
@@ -35,7 +35,7 @@ names(house_full) <- tolower(names(house_full))
 
 ```{r split-data}
 ## 70% of the sample size
-smp_size <- floor(0.7 * nrow(house))
+smp_size <- floor(0.9 * nrow(house))
 ## set the seed to make your partition reproducible
 set.seed(123)
 train_ind <- sample(seq_len(nrow(house)), size = smp_size)
@@ -63,22 +63,71 @@ pred_mod1 <- predict(mod1, test)
 
 ## The Learning Problem
 
-Y - Regression: Price (dollar amount)
+Y - Classification: Price categories (10 categories)
 X - Input: 
 
+Assign category (1-10) to price based on range (0, 100], (100, 300], (300, 500] ... (1500, 1700], (1700, $\infty$)
+
+# Then our problem can be re-phrased into: predict which category will the price 
+# falls into, which is a classification problem!
+
+## Hyperparameters
 
 This section presents the learning problem and the models you have considered. Some of the questions you could answer include “what are the parameters/hyperparameters?”, “how do you optimize these parameters?”, “explain how these parameters control the complexity/flexibility of the algorithm”, “does your method scale well with large data sets?”, etc.
 
 # Section 2: Experiment
 This section describes the data set you have chosen or got assigned and the experiment you have performed, including a justification of your choices (evaluation metric, optimization procedure, etc). How did you select the benchmark method?
 
+We considered three prominent gradient descent algorithms:
+
+1. RMSProp
+2. RGD with momentum
+3. Adaptive Moment Estimation (Adam)
+
+From these, we select Adam as it combines the strengths of RMSProp and momentum (Kingma, D et al). Adam stores an exponentially decaying average of past squared gradients like RMSprop, while also keeping an exponentially decaying average of past gradients, similar to momentum (Heusel, M et al). Whereas momentum can be seen as a ball running down a slope, Adam behaves like a heavy ball with friction, which prefers flat minima in the error surface.
+
+## Support Vector Machine
+
+```{r}
+load("data/test_x.rda")
+load("data/test_y.rda")
+
+load("data/train.rda")
+```
+
+```{r}
+
+#SVM
+library(e1071)
+#Fit a model. The function syntax is very similar to lm function
+model_svm <- svm(price_class ~ . , train)
+pred <- predict(model_svm, test)
+
+keras::loss_categorical_crossentropy(test$price_class,pred)
+  
+```
+
 ## Data 
 
 # Section 3: Results and Discussion
+
 This includes for example graphs and tables, as well as a discussion of the results. You should also present your model fitting, diagnostics, etc.
 
+
 # Section 4: Conclusion
+
 This includes a summary of the findings.
 
 # Appendix
+
+
+
+
+# References
+
+Sebastian Ruder (2016). An overview of gradient descent optimisation algorithms. arXiv preprint arXiv:1609.04747.
+
+Kingma, D. P., & Ba, J. L. (2015). Adam: a Method for Stochastic Optimization. International Conference on Learning Representations, 1–13.
+
+Heusel, M., Ramsauer, H., Unterthiner, T., Nessler, B., & Hochreiter, S. (2017). GANs Trained by a Two Time-Scale Update Rule Converge to a Local Nash Equilibrium. In Advances in Neural Information Processing Systems 30 (NIPS 2017).
 

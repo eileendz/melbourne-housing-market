@@ -61,11 +61,18 @@ pred_mod1 <- predict(mod1, test)
 
 # Section 1: Model
 
+## The Learning Problem
+
+Y - Regression: Price (dollar amount)
+X - Input: 
+
 
 This section presents the learning problem and the models you have considered. Some of the questions you could answer include “what are the parameters/hyperparameters?”, “how do you optimize these parameters?”, “explain how these parameters control the complexity/flexibility of the algorithm”, “does your method scale well with large data sets?”, etc.
 
 # Section 2: Experiment
 This section describes the data set you have chosen or got assigned and the experiment you have performed, including a justification of your choices (evaluation metric, optimization procedure, etc). How did you select the benchmark method?
+
+## Data 
 
 # Section 3: Results and Discussion
 This includes for example graphs and tables, as well as a discussion of the results. You should also present your model fitting, diagnostics, etc.

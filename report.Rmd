@@ -114,6 +114,8 @@ house_c %>%
 # Section 3: Results and Discussion
 This includes for example graphs and tables, as well as a discussion of the results. You should also present your model fitting, diagnostics, etc.
 
+this is jack's first pull request
+
 # Section 4: Conclusion
 This includes a summary of the findings.
 

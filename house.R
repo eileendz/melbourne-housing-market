@@ -44,6 +44,9 @@ set.seed(92472)
 house_split <- initial_split(house_c, prop = 0.9)  
 train <- house_split %>% training()
 test <- house_split %>% testing()
+#save(train, file = "data/train.rda")
+#save(test, file = "data/test.rda")
+
 
 # pre-processing data 
 rec_obj <- train %>% 
@@ -59,10 +62,10 @@ train_y <- to_categorical(pull(train, price_class)-1, 10)
 test_x <- bake(rec_obj, new_data = test) %>% select(-price_class)
 test_y <- to_categorical(pull(test, price_class)-1, 10)
 
-save(train_x, file = "data/train_x.rda")
-save(train_y, file = "data/train_y.rda")
-save(test_x, file = "data/test_x.rda")
-save(test_y, file = "data/test_y.rda")
+# save(train_x, file = "data/train_x.rda")
+# save(train_y, file = "data/train_y.rda")
+# save(test_x, file = "data/test_x.rda")
+# save(test_y, file = "data/test_y.rda")
 
 # NN model
 # dont really find a pre-trained architecture for house price forcasting, although there are articles on using ANN to predict

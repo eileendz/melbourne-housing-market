@@ -1,34 +1,77 @@
 ---
-title: "project-draft"
-author: "Eileen Dzhumasheva 27803376"
+title: "Melbourne housing market: Price modelling"
+subtitle: "ETC3555: Report"
+author: "Jack Cameron, Eileen Dzhumasheva, Huize Zhang"
 date: "14/10/2019"
-output: html_document
+output: pdf_document
 ---
+
+# Introduction
+
+In this project, we have been given a data set of all sold houses from March 2016 to December 2018 in Melbourne, detailing the sale price and a number of characteristics of the house. Our goal is to use this information, to predict the sale price of a house. The dataset contains information on 63,013 house sales scraped from publicly available results posted every week from Domain.com.au. The dataset includes variables that detail the suburb, adress, rooms, type of real estate, price, method of selling, seller, date, postcode, region, propertycount, distance from the CBD and council area. The dependent continous variable, y, defines the sale price of the house in AUD. Further details about the data set as well as some preliminary analysis are included in Appendix.
+
+```{r set-options, include=FALSE}
+knitr::opts_chunk$set(warning = FALSE, message = FALSE, 
+  comment = NA, dpi = 300, echo = FALSE,
+  fig.align = "center", out.width = "80%", cache = FALSE)
+```
 
 ```{r load-library}
 library(readr)
 library(tidyverse)
 ```
 
-```{r set-options}
-knitr::opts_chunk$set(warning = FALSE, message = FALSE, 
-  comment = NA, dpi = 300, echo = FALSE,
-  fig.align = "center", out.width = "80%", cache = FALSE)
-```
 
 ```{r load-data}
 house <- read.csv(here::here("data","MELBOURNE_HOUSE_PRICES_LESS.csv"))
 house_full <- read.csv(here::here("data","Melbourne_housing_FULL.csv"))
 ```
 
-```{r}
+```{r clean-data}
 # change variable names to lowercase
 names(house) <- tolower(names(house))
 names(house_full) <- tolower(names(house_full))
 ```
 
-```{r}
-mod1 <- glm(price ~ rooms + type + method ,data=house,family = gaussian)
-mod1
+```{r split-data}
+## 70% of the sample size
+smp_size <- floor(0.7 * nrow(house))
+## set the seed to make your partition reproducible
+set.seed(123)
+train_ind <- sample(seq_len(nrow(house)), size = smp_size)
+train <- house[train_ind, ]
+test <- house[-train_ind, ]
 ```
+
+```{r}
+#train %>% summary
+```
+
+```{r linear-model}
+mod1 <- glm(log(price) ~ rooms + type + postcode + distance, data=train, family = gaussian)
+pred_mod1 <- predict(mod1, test)
+
+
+```
+
+```{r random-forest}
+
+```
+
+
+# Section 1: Model
+
+
+This section presents the learning problem and the models you have considered. Some of the questions you could answer include “what are the parameters/hyperparameters?”, “how do you optimize these parameters?”, “explain how these parameters control the complexity/flexibility of the algorithm”, “does your method scale well with large data sets?”, etc.
+
+# Section 2: Experiment
+This section describes the data set you have chosen or got assigned and the experiment you have performed, including a justification of your choices (evaluation metric, optimization procedure, etc). How did you select the benchmark method?
+
+# Section 3: Results and Discussion
+This includes for example graphs and tables, as well as a discussion of the results. You should also present your model fitting, diagnostics, etc.
+
+# Section 4: Conclusion
+This includes a summary of the findings.
+
+# Appendix
 

@@ -108,7 +108,13 @@ house_c %>%
 ```
 
 
+We considered three prominent gradient descent algorithms:
 
+1. RMSProp
+2. RGD with momentum
+3. Adaptive Moment Estimation (Adam)
+
+From these, we select Adam as it combines the strengths of RMSProp and momentum (Kingma, D et al). Adam stores an exponentially decaying average of past squared gradients like RMSprop, while also keeping an exponentially decaying average of past gradients, similar to momentum (Heusel, M et al). Whereas momentum can be seen as a ball running down a slope, Adam behaves like a heavy ball with friction, which prefers flat minima in the error surface.
 
 
 # Section 3: Results and Discussion
@@ -121,3 +127,10 @@ This includes a summary of the findings.
 
 # Appendix
 
+# References
+
+Sebastian Ruder (2016). An overview of gradient descent optimisation algorithms. arXiv preprint arXiv:1609.04747.
+
+Kingma, D. P., & Ba, J. L. (2015). Adam: a Method for Stochastic Optimization. International Conference on Learning Representations, 1–13.
+
+Heusel, M., Ramsauer, H., Unterthiner, T., Nessler, B., & Hochreiter, S. (2017). GANs Trained by a Two Time-Scale Update Rule Converge to a Local Nash Equilibrium. In Advances in Neural Information Processing Systems 30 (NIPS 2017).

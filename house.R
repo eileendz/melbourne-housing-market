@@ -31,7 +31,7 @@ house_c <- house_less %>%
 # c(0, seq(1e2, 18e2, 2e2), max(house_less$price)) # notice inbalanced data - thus using loss function rather than accuracy as measuring criteria
   mutate(price_class = cut(house_less$price, breaks = c(0, seq(1e2, 18e2, 2e2), max(house_less$price)), label = FALSE)) %>% 
   select(-c(price, suburb, date)) # suburb and postcode are giving the same information maybe take only one?
-
+#save(house_c,file = "data/house_c.rda")
 # Then our problem can be re-phrased into: predict which category will the price 
 # falls into, which is a classification problem!
 
@@ -44,6 +44,9 @@ set.seed(92472)
 house_split <- initial_split(house_c, prop = 0.9)  
 train <- house_split %>% training()
 test <- house_split %>% testing()
+#save(train, file = "data/train.rda")
+#save(test, file = "data/test.rda")
+
 
 # pre-processing data 
 rec_obj <- train %>% 
@@ -58,6 +61,11 @@ train_x <- train_x %>% as.matrix()
 train_y <- to_categorical(pull(train, price_class)-1, 10)
 test_x <- bake(rec_obj, new_data = test) %>% select(-price_class)
 test_y <- to_categorical(pull(test, price_class)-1, 10)
+
+# save(train_x, file = "data/train_x.rda")
+# save(train_y, file = "data/train_y.rda")
+# save(test_x, file = "data/test_x.rda")
+# save(test_y, file = "data/test_y.rda")
 
 # NN model
 # dont really find a pre-trained architecture for house price forcasting, although there are articles on using ANN to predict
@@ -82,7 +90,8 @@ FLAGS <- flags(
   flag_numeric("learning_rate", 1e4), 
   flag_integer("epoch", 500), 
   flag_integer("batch_size", 32), 
-  flag_string("activation", "relu")
+  flag_string("activation", "relu"), 
+  flag_numeric("regulaser", 1e-3)
 )
 early_stop <- callback_early_stopping(monitor = "val_loss", patience = 20,
                                       restore_best_weights = TRUE) 
@@ -90,16 +99,18 @@ early_stop <- callback_early_stopping(monitor = "val_loss", patience = 20,
 
 k_clear_session()
 model <- keras_model_sequential() %>% 
-  layer_dense(units = FLAGS$dense_unit1, activation = FLAGS$activation, input_shape = 277) %>%  # input_shape is the dimension of the input EXCLUDING THE SAMPLE AXIS!and dont put c(277) - for some reason it doesnt work!
+  layer_dense(units = FLAGS$dense_unit1, activation = FLAGS$activation, input_shape = 277,
+              kernel_regularizer = regularizer_l2(l = FLAGS$regulaser)) %>%  # input_shape is the dimension of the input EXCLUDING THE SAMPLE AXIS!and dont put c(277) - for some reason it doesnt work!
   layer_dropout(rate = FLAGS$dropout) %>% 
   layer_batch_normalization() %>% 
-  layer_dense(units = FLAGS$dense_unit2, activation = FLAGS$activation) %>% 
+  layer_dense(units = FLAGS$dense_unit2, activation = FLAGS$activation,
+              kernel_regularizer = regularizer_l2(l = FLAGS$regulaser)) %>% 
   layer_dropout(rate = FLAGS$dropout) %>% 
   layer_batch_normalization() %>% 
   layer_dense(units = 10, activation = "softmax") %>% 
   compile(optimizer = optimizer_adam(FLAGS$learning_rate), 
           loss = "categorical_crossentropy", 
-          metrics = "acc")
+          metrics = "loss")
 
 # parameter tuning via cross validation
 
@@ -150,10 +161,4 @@ ind_result <- tibble::as_tibble(history$metrics)
 
 
 
-
-# For the nn, we could do something like "self-organizing map (SOM)" or "Learning vector quantization" (LVQ), 
-# which is popular for multi-label classification. Multi-Task Learning may also
-# work. Here are some papers: 
-
-## maybe just stick to the ones taught in class???
 

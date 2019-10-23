@@ -116,11 +116,8 @@ We considered three prominent gradient descent algorithms:
 
 From these, we select Adam as it combines the strengths of RMSProp and momentum (Kingma, D et al). Adam stores an exponentially decaying average of past squared gradients like RMSprop, while also keeping an exponentially decaying average of past gradients, similar to momentum (Heusel, M et al). Whereas momentum can be seen as a ball running down a slope, Adam behaves like a heavy ball with friction, which prefers flat minima in the error surface.
 
-
 # Section 3: Results and Discussion
 This includes for example graphs and tables, as well as a discussion of the results. You should also present your model fitting, diagnostics, etc.
-
-this is jack's first pull request
 
 # Section 4: Conclusion
 This includes a summary of the findings.

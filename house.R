@@ -22,7 +22,8 @@ house_less<- read_csv("data/MELBOURNE_HOUSE_PRICES_LESS.csv") %>%
   filter(!is.na(price)) 
 
 # the data is right skewed! 
-house_less %>% ggplot(aes(x = price)) + geom_histogram()
+house_less %>% ggplot(aes(x = log(price))) + geom_histogram() + 
+  geom_vline(xintercept = log(breaks), color = "grey2", lty = 2)
 
 house_c <- house_less %>% 
   # assign category (1-10) to price based on range (0, 100], (100, 300], (300, 500] ... (1500, 1700], (1700, $\infty$)

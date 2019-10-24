@@ -22,7 +22,8 @@ house_less<- read_csv("data/MELBOURNE_HOUSE_PRICES_LESS.csv") %>%
   filter(!is.na(price)) 
 
 # the data is right skewed! 
-house_less %>% ggplot(aes(x = price)) + geom_histogram()
+house_less %>% ggplot(aes(x = log(price))) + geom_histogram() + 
+  geom_vline(xintercept = log(breaks), color = "grey2", lty = 2)
 
 house_c <- house_less %>% 
   # assign category (1-10) to price based on range (0, 100], (100, 300], (300, 500] ... (1500, 1700], (1700, $\infty$)
@@ -87,30 +88,30 @@ FLAGS <- flags(
   flag_integer("dense_unit1", 512),
   flag_numeric("dropout", 0.2), 
   flag_integer("dense_unit2", 256),
-  flag_numeric("learning_rate", 1e4), 
-  flag_integer("epoch", 500), 
+  flag_numeric("learning_rate", 1e-4), 
+  flag_integer("epoch", 100), 
   flag_integer("batch_size", 32), 
   flag_string("activation", "relu"), 
-  flag_numeric("regulaser", 1e-3)
+  flag_numeric("reguliser", 1e-3)
 )
-early_stop <- callback_early_stopping(monitor = "val_loss", patience = 20,
+early_stop <- callback_early_stopping(monitor = "val_loss", patience = 5,
                                       restore_best_weights = TRUE) 
 
 
 k_clear_session()
 model <- keras_model_sequential() %>% 
   layer_dense(units = FLAGS$dense_unit1, activation = FLAGS$activation, input_shape = 277,
-              kernel_regularizer = regularizer_l2(l = FLAGS$regulaser)) %>%  # input_shape is the dimension of the input EXCLUDING THE SAMPLE AXIS!and dont put c(277) - for some reason it doesnt work!
+              kernel_regularizer = regularizer_l2(l = FLAGS$reguliser)) %>%  # input_shape is the dimension of the input EXCLUDING THE SAMPLE AXIS!and dont put c(277) - for some reason it doesnt work!
   layer_dropout(rate = FLAGS$dropout) %>% 
   layer_batch_normalization() %>% 
   layer_dense(units = FLAGS$dense_unit2, activation = FLAGS$activation,
-              kernel_regularizer = regularizer_l2(l = FLAGS$regulaser)) %>% 
+              kernel_regularizer = regularizer_l2(l = FLAGS$reguliser)) %>% 
   layer_dropout(rate = FLAGS$dropout) %>% 
   layer_batch_normalization() %>% 
   layer_dense(units = 10, activation = "softmax") %>% 
   compile(optimizer = optimizer_adam(FLAGS$learning_rate), 
           loss = "categorical_crossentropy", 
-          metrics = "loss")
+          metrics = "acc")
 
 # parameter tuning via cross validation
 

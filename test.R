@@ -1,5 +1,5 @@
 library(keras)
-
+load("data/test.rda")
 load("data/train_x.rda")
 load("data/train_y.rda")
 load("data/test_x.rda")
@@ -29,6 +29,9 @@ model %>% fit(train_x, train_y,
               callbacks = early_stop)
 
 eval <- model %>% evaluate(as.matrix(test_x), test_y)
+eval$acc
 
 predicted_class <- model %>% predict_classes(as.matrix(test_x))
+
+table(predicted_class, test$price_class)
 

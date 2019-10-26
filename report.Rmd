@@ -1,8 +1,6 @@
 ---
-title: "Melbourne housing market: Price modelling"
-subtitle: "ETC3555: Report"
+title: "Melbourne housing market: Price modelling ETC3555 report"
 author: "Jack Cameron, Eileen Dzhumasheva, Huize Zhang"
-date: "14/10/2019"
 output: pdf_document
 geometry: margin=2cm
 ---
@@ -148,7 +146,6 @@ The metrics for evaluation is the loss function rather than the accuracy result.
 
 <!-- optimization procedure -->
 <!-- how to select benchmark model -->
-
 
 
 ```{r price-class, fig.height=2}

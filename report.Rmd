@@ -83,7 +83,7 @@ We seperate our dataset into a 90:10 training-test split, and perform all of our
 
 Kauko[reference] has provided an overview on current neural network application on predicting  house price and introduced some advanced methods like self-organising map(SOM) and learning vector quantization (LVQ). However, there is no pre-trained architecture for house price forecasting and thus, we build our own two layer deep neural network from scratch. Based on the size of our data (48k observations with 277 features) and the project goal (classifying house price into 10 categories), it is not sensible to construct a neural network with more than 4 layers. Although Neural network with 3 layers may also work, adding an additional means more parameter tuning and computing, which appears to be too complex for my computer lo. 
 
-```{r fig-architecture, fig.cap="Neural network architecture.", fig.height=10}
+```{r fig-architecture, fig.cap="Neural network architecture."}
 knitr::include_graphics("nn.png")
 ```
 

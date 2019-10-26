@@ -8,7 +8,7 @@ output: pdf_document
 
 # Introduction
 
-In this project, we have been given a data set of all sold houses from March 2016 to December 2018 in Melbourne, detailing the sale price and a number of characteristics of the house. Our goal is to use this information, to predict the sale price of a house. 
+This project looks at the feasibility of applying machine learning tools to the pricing of houses. We review and apply machine learning concepts through the lens of a dataset consisting of all privately sold houses in Melbourne between March 2016 and December 2018 with information on hedonic and structural characteristics. Our goal is to predict the sale price of a house, and performance will be benchmarked against an alternative, more simplistic, approach.
 
 ```{r set-options, include=FALSE}
 knitr::opts_chunk$set(warning = FALSE, message = FALSE, 
@@ -16,17 +16,57 @@ knitr::opts_chunk$set(warning = FALSE, message = FALSE,
   fig.align = "center", out.width = "80%", cache = FALSE)
 ```
 
-```{r load-library}
-library(readr)
-library(tidyverse)
-```
+# Section 1: Model  
+Model selection was born from discussion of our objectives, and consideration of our dataset.
 
-
-# Section 1: Model
+<!-- Learning problem -->
+<!-- Models considered -->
+<!-- What are the parameters / hyperparameters -->
+<!-- How to optimize them -->
+<!-- how they control the complexity/flexibility of the algorithm -->
+<!-- does the method scale with large data sets, etc -->
 
 ## The Learning Problem
+For the problem of predicting house prices for private sales, a theoretical unknown target function exists, but we don't believe any practical target function exists. The simple rationale is that private sales are too heavily dependent on subjective characteristics of how the buyer buys, and how the seller sells, to be accurately approximated in any qualitative or quantitative sense.  
+With this said, our unknown target distribution is therefore the best approximation to such an issue. In considering the modelling approach to take, we reflected on the real world application of such a tool. Presently, when houses are put up for sale they list with an expected range. Similarly, when houses are bid upon, they are done so with nominal amounts of money, such as $10,000 increments. Given such use cases it seems misguided to attempt to price a house at an exact dollar figure, and more sensible to attempt to classify house prices into ranges of prices.  
 
-This section presents the learning problem and the models you have considered. Some of the questions you could answer include “what are the parameters/hyperparameters?”, “how do you optimize these parameters?”, “explain how these parameters control the complexity/flexibility of the algorithm”, “does your method scale well with large data sets?”, etc.
+After narrowing down our approach, we consider a neural net for the purpose of this project, and an appropriate benchmark model reflecting our need.  
+For the benchmark we considered the following models  
+
+* OLS Regression with range classification in post-estimation  
+* Decision Tree / Random forests  
+* Naive Bayes  
+* Multi-class logistic regression
+
+OLS regression was ruled out for it's distributional assumptions which did not fit our dataset, and the desire to choose a model with inherent classification abilities. Naive Bayes was considered for it's ease of implementation and understanding, but ruled out for preference of a more complex model. The choice ultimately came down to random forests and multi-class, or multi-nomial logistic regression. The latter was chosen for it's relatively simple implementation, computational speed, and well documented success in multi-class classification. 
+
+For our neural net, the classification approach simplified things as we were familiar with its implementation from the lecture and tutorial material. The structure and considerations will now be introduced.  
+We used two dense layers and optimized for node sizes for each.
+<!-- WHY 2 dense layers?-->
+A dropout layer preceeding batch normalization to increase computation speed.
+<!-- This the only reason? -->
+Activation functions considered were Relu, Leaky-Relu, and Tanh for hidden layers, the latter to review the effect of both allowing negative inputs to remain negative, and Relu for the simple reason that it doesn't activate all neurons at once allowing for faster computation. Leaky-Relu was considered for ???????. Softmax was used for our final layer because ?????
+<!-- This make sense? & FILL IN BLANKS -->
+We used L2 regularization on both layers to prevent overfitting of our training data.
+<!-- WHY L2? -->
+We implemented early stopping as an additional form of regularization to prevent overfitting and allow for faster computation. The target value was loss over accuracy to allow greater generalization onto our test set. We did not tune this parameter and patience was set to 20.  
+For optimization we used ADAM as theoretically it encorporates both momentum and stochastic gradient descent, thus outperforming both alone.  
+<!-- check -->
+For our loss function we naturally used classification cross-entropy loss.
+<!-- check -->
+Our hyperparameters were tuned for tuned for using grid-search, but due to computation issues stemming from the number of iterations the search had to perform we were only able to proceed half way through this tuning procedure. Discussion of the ranges tuned for each hypterparamter will be included in our experimentation section. 
+As for the scaling of our model, we believe given a larger data-set the model would have actually performed better. We had a relatively small feature space to run a neural net, and loss and accuracy may have improved given this was expanded. Performance of the multinomial logistic regression would not be expected to have changed, but the computation time would have significantly grown.
+
+
+<!-- What are the parameters / hyperparameters -->
+<!-- Not sure if I've mentioned them all -->
+
+<!-- How to optimize them -->
+
+<!-- how they control the complexity/flexibility of the algorithm -->
+<!-- I didn't really address this -->
+<!-- help -->
+
 
 # Section 2: Experiment
 

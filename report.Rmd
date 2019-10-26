@@ -1,7 +1,8 @@
 ---
 title: "ETC3555 Melbourne housing market: Price modelling"
 author: "Jack Cameron, Eileen Dzhumasheva, Huize Zhang"
-output: pdf_document
+output:
+  pdf_document:
 geometry: margin=1.5cm
 ---
 
@@ -13,7 +14,7 @@ This project looks at the feasibility of applying machine learning tools to the 
 library(tidyverse)
 knitr::opts_chunk$set(warning = FALSE, message = FALSE, 
   comment = NA, dpi = 300, echo = FALSE,
-  fig.align = "center", out.width = "80%", cache = FALSE)
+  fig.align = "center", out.width = "80%", cache = FALSE, fig.pos= "h")
 
 library(tidyverse)
 library(knitr)
@@ -133,13 +134,15 @@ kable(tibble(Hyperparameter = c("dense_unit1", "dense_unit2", "dropout", "batch_
 ```
 
 This model is then performed on the test set and the prediction matrix is presented in Table \ref(tab:pred-matrix-nn). The accuracy of neural network algorithm is 50%. The multinomial logistic model is also performedon the test set and the accuracy is 51%. Associated prediction matrix is presented in Table \ref(tab:pred-matrix-mnl). 
+```{r}
+load("data/pred_nn")
+load("data/pred_mnl")
+```
 
 ```{r pred-matrix-nn}
-load("data/pred_nn")
 knitr::kable(pred_nn,caption ="Neural netowrk prediction matrix")
 ```
 ```{r pred-matrix-mnl}
-load("data/pred_mnl")
 knitr::kable(pred_mnl,caption="Multinomial logistic prediction matrix")
 ```
 

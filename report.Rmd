@@ -119,12 +119,7 @@ kable(tibble(Hyperparameter = c("dense_unit1", "dense_unit2",
        caption = "\\label{tab:hyper-para} The grid value of parameter used in hyperparameter tuning")
 ```
 
-<<<<<<< HEAD
 ## Section 3: Results and Discussion
-=======
-
-# Section 3: Results and Discussion
->>>>>>> d2698795fd7235d6e9f37cf0b43895068374a845
 
 The hypterparameter tuning on the grid defined above is implemented through `tfruns` package. This package allows for organising the training parameters and evaluation results into a dataframe format and create a shiny app to view each training process. Figure \ref{fig:best} provides a screenshot of the best result from the training. The parameter assocaited with the best validation result is presented in Table \ref{tab:best-para}
 

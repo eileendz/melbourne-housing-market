@@ -11,6 +11,7 @@ output: pdf_document
 This project looks at the feasibility of applying machine learning tools to the pricing of houses. We review and apply machine learning concepts through the lens of a dataset consisting of all privately sold houses in Melbourne between March 2016 and December 2018 with information on hedonic and structural characteristics. Our goal is to predict the sale price of a house, and performance will be benchmarked against an alternative, more simplistic, approach.
 
 ```{r set-options, include=FALSE}
+library(tidyverse)
 knitr::opts_chunk$set(warning = FALSE, message = FALSE, 
   comment = NA, dpi = 300, echo = FALSE,
   fig.align = "center", out.width = "80%", cache = FALSE)
@@ -51,9 +52,6 @@ For our neural net, the classification approach simplified things as we were fam
 Kauko (2003) has provided an overview on current neural network application on predicting  house price and introduced some advanced methods like self-organising map(SOM) and learning vector quantization (LVQ). However, there is no pre-trained architecture for house price forecasting and thus, we build our own two layer deep neural network from scratch. Due to the size of the data (48k observations with 277 features), the architecture is a deep neural network with two hidden layer. A graphic illustration of the architecture is shown in Figure \ref{fig:architecture}. A three hidden layer architecture is also considered but due to the extra computational burden associated with training and hyperparameter training, it is not implemented in this project. 
 
 
-```{r}
-#include_graphics()
-```
 
 The activation function for the middle layers are relu function. This choice is made based on two considerations. 
 
@@ -104,7 +102,9 @@ As for the scaling of our model, we believe given a larger data-set the model wo
 
 ## Data
 
-The dataset contains information on 63,013 house sales scraped from publicly available results posted every week from Domain.com.au. The dataset includes variables that detail the suburb, address, rooms, type of real estate, price, method of selling, seller, date, postcode, region, propertycount, distance from the CBD and council area. The dependent continuous variable, y, defines the sale price of the house in AUD. 
+Our dataset was compiled by a user named 'Tony Pino' on kaggle. The data concerns Melbourne housing clearance data from March 2016 through to December 2018. It is important to note that the available datasets in this database were 'Melbourne House Prices Less' and 'Melbourne Housing Full', specifying a reduced and full dataset respectively. Our project looked only at the reduced dataset. Therefore an extension which will be touched on in the latter sections of this report will discuss the changes in results had we used the full dataset.  
+
+Our dataset contained information on 63,013 house sales scraped from publicly available results posted every week on Domain.com.au. The dataset includes variables that detail the suburb, address, rooms, type of real estate, price, method of selling, seller-name, date, postcode, region, propertycount, distance from the CBD and council area. Given we are predicting house prices, the dependent continuous variable, y, defines the sale price of the house in AUD. Further details about the data set as well as some preliminary analysis are included in Appendix. Within our data the decision was made to exclude the seller-name on the basis that it was the individual agent's name and thus irrelevant. This decision was made in error and discovered after our model had been run. The seller name is the name of the real-estate agency entrusted with the sale of the house, and thus contains relevant information to the sale price. Inclusion of this variable would have significantly increased our feature space and it is likely our model suffered from it's exclusion. Thus this is a natural extension to our research.
 
 ## Data Manipulation
 
@@ -112,13 +112,43 @@ We first convert our regression problem into a classification problem by transfo
 
 We seperate our dataset into a 90:10 training-test split. The training is done on the 90% of the data with 20% as validation set and the best model fit is then performed on the test set to get the accuracy result. 
 
- 
 The data is first scaled and centred before sending into the neural network for training and normalisation is performed before each dense layer. This normalisation is 
 necessary because it helps to speed up the converging process by normalising the extreme large value outputted from the previous layer. 
 
 
+Kauko[reference] has provided an overview on current neural network application for predicting house prices and introduced some advanced methods including self-organising map (SOM) and learning vector quantization (LVQ). However there is no pre-trained architecture for house price forecasting and thus we build our own two layer deep neural network from scratch. Based on the size of our data (48k observations with 277 features) and the project goal (classifying house price into 10 categories), it is not sensible to construct a neural network with more than 4 layers. Neural network with 3 layers may also work, but adding an additional layer increases the computational requirements for the tuning of a model that was already too heavy for our computers to handle. This is a possible extension of our study.
 
-The metrics for evaluation is the loss function rather than the accuracy result. This design is chosen because from the data, the house price is not evenly distributed among all the categories. We can see from Figure \ref{fig:price-class}, price class 4 (ranging from (500k, 700k]) has the most number of observation falls into while very few observations belong to category 1 or 2. If accuracy measure is used for evaluating the algorithm, it will prone to predict category 4 or 5 to achieve a higher accuracy result while not learn the data well. Therefore, loss function, evaluating the performance of the algorithm based on its score on categorical cross entropy is a more reliable measure. 
+```{r fig-architecture, fig.cap="Neural network architecture."}
+knitr::include_graphics("nn.png")
+```
+
+We proceed by scaling and centering our data, transforming factors using one-hot encoding to increase feature space and allow our algorithm to improve in prediction, and we subset our data into sets of 90% training and 10% test.
+
+In running our model normalisation is performed before each dense layer. This normalisation is necessary because it helps to speed up the converging process by normalising the extreme large value outputted from the previous layer. 
+
+
+
+
+1) relu function produces zero output for negative input, this would be helpful to avoid overfitting because a proportion of the features will be set to zeros. 
+
+2) unlike tanh function which will saturate at the asymptotic, which means the weight will not be updated much when the input neural has a large value, Relu functions will increase to infinity. This property of relu allows the relevant weight to be updated when the input gets larger. And the potential drawback of getting extremely large output is overcome through the aforementioned batch normalisation.
+
+The activation function for the final layer is softmax as this is the appropriate function for multi-level classification as it bounds probability ranges between 0-1, and the sum of probability for inclusion into each category will sum to 1. 
+
+To avoid overfitting of the data, several regularisation methods are used. Dropout rate is used before each dense layer. One thing to notice is that the dropout rate is added before the batch normalisation because otherwise the normalisation will be based on the full data while part of them will be dropped out before supplied to the next layer. Regularisation is also applied in each layer with learning rate being a hyper-parameter to tune. 
+
+Early stopping is also used to allow for more efficient updating on the parameter. We set max epochs at a large fixed value of 500 and use `patience = 20` for the early stopping in our network structure. This design allows the neural network to continue updating if needed while, not wasting computational power and time when the updates become slow.
+
+The optimisation used is ADAM. Different optimiser such as Root Mean Square Propagation (RMSPROP) or Random Gradient Descent (RGD) could be used for tuning but theoratically ADAM is believed to have better performance since it incorporates the momentum from RMSPROP to RGD The learning rate for ADAM is treated as a hyperparameter to tune. 
+
+The loss function used is the categorical cross entropy, which is the only option for multi-class classification.
+
+The metrics for evaluation is the loss function rather than the accuracy result. This design is chosen as the house prices in our data are not evenly distributed among all the categories. We can see from Figure \ref{fig:price-class}, price class 4 (ranging from (500k, 700k]) has the most number of observation falls into while very few observations belong to category 1 or 2. If accuracy measure is used for evaluating the algorithm, it will be prone to predicting category 4 or 5 to achieve a higher accuracy result while not learn the data well. Therefore loss function, which evaluates the performance of the algorithm based on its score on categorical cross entropy, is a more reliable measure for our use case. 
+
+<!-- optimization procedure -->
+<!-- how to select benchmark model -->
+
+
 
 ```{r price-class}
 load("data/house_c.rda")
@@ -136,9 +166,6 @@ We considered three prominent gradient descent algorithms:
 3. Adaptive Moment Estimation (Adam)
 
 From these, we select Adam as it combines the strengths of RMSProp and momentum (Kingma, D et al). Adam stores an exponentially decaying average of past squared gradients like RMSprop, while also keeping an exponentially decaying average of past gradients, similar to momentum (Heusel, M et al). Whereas momentum can be seen as a ball running down a slope, Adam behaves like a heavy ball with friction, which prefers flat minima in the error surface.
-
-
-
 
 # Section 3: Results and Discussion
 
@@ -170,6 +197,8 @@ pred_mnl
 The neural network is not competitive as the multinomial logistic model from our result. Two reasons could explain this. Firstly. the faeture space (277 variables) of the current dataset is relatively small. This could cause we are not able to build more sophisticated neural network for it to work it magic. Also later we realise the `seller` variable is the name of the selling agency rather than the name of the individual seller. One may expect the selling price of a house could related to the selling agency and this variable could also be added into the neural network. Also there is a larger house price dataset in kaggle and it provides additional information related to the house. 
 
 The second reason is due to the limitation of computation power. There are still some parameters we are keeping constant through the hyperparameter tuning, for example, learning rate. There are also more activation function such as LeakyRELU that we could try to see if better performance can be achieved. 
+
+
 
 
 # Section 4: Conclusion

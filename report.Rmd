@@ -52,9 +52,6 @@ For our neural net, the classification approach simplified things as we were fam
 Kauko (2003) has provided an overview on current neural network application on predicting  house price and introduced some advanced methods like self-organising map(SOM) and learning vector quantization (LVQ). However, there is no pre-trained architecture for house price forecasting and thus, we build our own two layer deep neural network from scratch. Due to the size of the data (48k observations with 277 features), the architecture is a deep neural network with two hidden layer. A graphic illustration of the architecture is shown in Figure \ref{fig:architecture}. A three hidden layer architecture is also considered but due to the extra computational burden associated with training and hyperparameter training, it is not implemented in this project. 
 
 
-```{r}
-#include_graphics()
-```
 
 The activation function for the middle layers are relu function. This choice is made based on two considerations. 
 
@@ -115,6 +112,9 @@ We first convert our regression problem into a classification problem by transfo
 
 We seperate our dataset into a 90:10 training-test split. The training is done on the 90% of the data with 20% as validation set and the best model fit is then performed on the test set to get the accuracy result. 
 
+The data is first scaled and centred before sending into the neural network for training and normalisation is performed before each dense layer. This normalisation is 
+necessary because it helps to speed up the converging process by normalising the extreme large value outputted from the previous layer. 
+
 
 Kauko[reference] has provided an overview on current neural network application for predicting house prices and introduced some advanced methods including self-organising map (SOM) and learning vector quantization (LVQ). However there is no pre-trained architecture for house price forecasting and thus we build our own two layer deep neural network from scratch. Based on the size of our data (48k observations with 277 features) and the project goal (classifying house price into 10 categories), it is not sensible to construct a neural network with more than 4 layers. Neural network with 3 layers may also work, but adding an additional layer increases the computational requirements for the tuning of a model that was already too heavy for our computers to handle. This is a possible extension of our study.
 
@@ -125,6 +125,7 @@ knitr::include_graphics("nn.png")
 We proceed by scaling and centering our data, transforming factors using one-hot encoding to increase feature space and allow our algorithm to improve in prediction, and we subset our data into sets of 90% training and 10% test.
 
 In running our model normalisation is performed before each dense layer. This normalisation is necessary because it helps to speed up the converging process by normalising the extreme large value outputted from the previous layer. 
+
 
 
 

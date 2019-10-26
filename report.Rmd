@@ -56,15 +56,7 @@ knitr::include_graphics("nn.png")
 
 Two activation functions, Relu and Tanh are chosen to tune for the middle layers. Relu has its advantage of outputting zeros for negative input, which would be helpful to avoid overfitting. Also, Relu function will increase to infinity at asymptotic and this property allows the relevant weight to be fully updated when the input gets larger. Tanh is also considered because it is  an symmetric activation function that will provide symmetric result for positive and negative inputs (thus don't need normalisation) but unlike relu function, it saturates at asymptotic, which may cause large inputs not being able to get updated. The activation function for the final layer is softmax as this is the appropriate function for multi-level classification as it bounds probability ranges between 0-1, and the sum of probability for inclusion into each category will sum to 1. 
 
-To avoid overfitting of the data, dropout and l2 regularisation are used. Dropout rate is used before each dense layer and is a tuning parameter in the grid serach. L2 regularisation is also applied in each layer to avoid overfitting and a learning rate of 1e-3 is used. 
-
-
-Batch normalisation is also performed before each dense layer. This process is necessary because it will normalise the extreme large values from the previous layer so that the training process can speed up. Batch normalisation is added after the dropout layer since it makes more sense to only normalise the neurals that will be supplied into the next layer. 
-
-The loss function used is the categorical cross entropy, which is the only option for multi-class classification. 
-
-
-Our hyperparameters were tuned using grid-search, but due to computation issues stemming from the number of iterations the search had to perform we were only able to proceed half way through this tuning procedure. Discussion of the ranges tuned for each hypterparamter will be included in our experimentation section. 
+To further avoid overfitting of the data, dropout and l2 regularisation are used. Dropout rate is used before each dense layer and is a tuning parameter in the grid serach. L2 regularisation is also applied in each layer to avoid overfitting and a learning rate of 1e-3 is used. Batch normalisation is also performed before each dense layer. This process is necessary because it will normalise the extreme large values from the previous layer so that the training process can speed up. Batch normalisation is added after the dropout layer since it makes more sense to only normalise the neurals that will be supplied into the next layer. The loss function used is the categorical cross entropy, which is the only option for multi-class classification. Our hyperparameters were tuned using grid-search, but due to computation issues stemming from the number of iterations the search had to perform we were only able to proceed half way through this tuning procedure. Discussion of the ranges tuned for each hypterparamter will be included in our experimentation section. 
 
 
 As for the scaling of our model, we believe given a larger data-set the model would have actually performed better. We had a relatively small feature space to run a neural net, and loss and accuracy may have improved given this was expanded. Performance of the multinomial logistic regression would not be expected to have changed, but the computation time would have significantly grown.
@@ -140,13 +132,13 @@ load("data/pred_mnl")
 ```
 
 ```{r pred-matrix-nn}
-knitr::kable(pred_nn,caption ="Neural netowrk prediction matrix")
+knitr::kable(pred_nn,caption ="Neural network prediction matrix")
 ```
 ```{r pred-matrix-mnl}
 knitr::kable(pred_mnl,caption="Multinomial logistic prediction matrix")
 ```
 
-The neural network is not competitive as the multinomial logistic model from our result. Two reasons could explain this. Firstly. the faeture space (277 variables) of the current dataset is relatively small. This could cause we are not able to build more sophisticated neural network for it to work it magic. Also later we realise the `seller` variable is the name of the selling agency rather than the name of the individual seller. One may expect the selling price of a house could related to the selling agency and this variable could also be added into the neural network. Also there is a larger house price dataset in kaggle and it provides additional information related to the house. 
+The neural network is not competitive as the multinomial logistic model from our result. Two reasons could explain this. Firstly. the feature space (277 variables) of the current dataset is relatively small. This could cause we are not able to build more sophisticated neural network for it to work it magic. Also later we realise the `seller` variable is the name of the selling agency rather than the name of the individual seller. One may expect the selling price of a house could related to the selling agency and this variable could also be added into the neural network. Also there is a larger house price dataset in kaggle and it provides additional information related to the house. 
 
 The second reason is due to the limitation of computation power. There are still some parameters we are keeping constant through the hyperparameter tuning, for example, learning rate. There are also more activation function such as LeakyRELU that we could try to see if better performance can be achieved. 
 

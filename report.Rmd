@@ -133,7 +133,7 @@ kable(tibble(Hyperparameter = c("dense_unit1", "dense_unit2", "dropout", "batch_
        Value = c(256, 64, 0.2, 256, "relu")),caption = "\\label{tab:best-para} Best parameters")
 ```
 
-This model is then performed on the test set and the prediction matrix is presented in Table \ref(tab:pred-matrix-nn). The accuracy of neural network algorithm is 50%. The multinomial logistic model is also performedon the test set and the accuracy is 51%. Associated prediction matrix is presented in Table \ref(tab:pred-matrix-mnl). 
+This model is then performed on the test set and the prediction matrix is presented in Table 3. The accuracy of neural network algorithm is 50%. The multinomial logistic model is also performedon the test set and the accuracy is 51%. Associated prediction matrix is presented in Table 4. 
 ```{r}
 load("data/pred_nn")
 load("data/pred_mnl")

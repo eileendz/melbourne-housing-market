@@ -5,7 +5,7 @@ output: pdf_document
 geometry: margin=1.5cm
 ---
 
-# Introduction
+## Introduction
 
 This project looks at the feasibility of applying machine learning tools to the pricing of houses. We review and apply machine learning concepts through the lens of a dataset consisting of all privately sold houses in Melbourne between March 2016 and December 2018 with information on hedonic and structural characteristics. Our goal is to predict the sale price of a house, and performance will be benchmarked against an alternative, more simplistic, approach.
 
@@ -21,7 +21,7 @@ library(tfruns)
 ```
 
 
-# Section 1: Model  
+## Section 1: Model  
 Model selection was born from discussion of our objectives, and consideration of our dataset.
 
 <!-- Learning problem -->
@@ -80,17 +80,15 @@ The loss function used is the categorical cross entropy, which is the only optio
 Our hyperparameters were tuned for tuned for using grid-search, but due to computation issues stemming from the number of iterations the search had to perform we were only able to proceed half way through this tuning procedure. Discussion of the ranges tuned for each hypterparamter will be included in our experimentation section. 
 As for the scaling of our model, we believe given a larger data-set the model would have actually performed better. We had a relatively small feature space to run a neural net, and loss and accuracy may have improved given this was expanded. Performance of the multinomial logistic regression would not be expected to have changed, but the computation time would have significantly grown.
 
-# Section 2: Experiment
+## Section 2: Experiment
 
-## Data
+### Data
 
 Our dataset was compiled by a user named 'Tony Pino' on kaggle. The data concerns Melbourne housing clearance data from March 2016 through to December 2018. It is important to note that the available datasets in this database were 'Melbourne House Prices Less' and 'Melbourne Housing Full', specifying a reduced and full dataset respectively. Our project looked only at the reduced dataset. Therefore an extension which will be touched on in the latter sections of this report will discuss the changes in results had we used the full dataset.  
 
 Our dataset contained information on 63,013 house sales scraped from publicly available results posted every week on Domain.com.au. The dataset includes variables that detail the suburb, address, rooms, type of real estate, price, method of selling, seller-name, date, postcode, region, propertycount, distance from the CBD and council area. Given we are predicting house prices, the dependent continuous variable, y, defines the sale price of the house in AUD. Further details about the data set as well as some preliminary analysis are included in Appendix. Within our data the decision was made to exclude the seller-name on the basis that it was the individual agent's name and thus irrelevant. This decision was made in error and discovered after our model had been run. The seller name is the name of the real-estate agency entrusted with the sale of the house, and thus contains relevant information to the sale price. Inclusion of this variable would have significantly increased our feature space and it is likely our model suffered from it's exclusion. Thus this is a natural extension to our research.
 
-## Data Manipulation
-
-We first convert our regression problem into a classification problem by transforming house price into 10 categories: (0, 100k], (100k, 300k], (300k, 500k] ... (1500k, 1700k], (1700k, $\infty$) and this allows us to perform neural network on a multi-class classification problem, which is much easier than prediction. Our motivation for this is also because houses priced in the millions often have ___ characteristics that...
+We first convert our regression problem into a classification problem by transforming house price into 10 categories: (0, 100k], (100k, 300k], (300k, 500k] ... (1500k, 1700k], (1700k, $\infty$) and this allows us to perform neural network on a multi-class classification problem, which is much easier than prediction.
 
 We seperate our dataset into a 90:10 training-test split. The training is done on the 90% of the data with 20% as validation set and the best model fit is then performed on the test set to get the accuracy result. 
 
@@ -100,7 +98,7 @@ We proceed by scaling and centering our data, transforming factors using one-hot
 
 <!-- The optimisation used is ADAM. Different optimiser such as Root Mean Square Propagation (RMSPROP) or Random Gradient Descent (RGD) could be used for tuning but theoratically ADAM is believed to have better performance since it incorporates the momentum from RMSPROP to RGD The learning rate for ADAM is treated as a hyperparameter to tune.  -->
 
-## Evaluation metric
+### Evaluation metric
 
 The metrics for evaluation is the loss function rather than the accuracy result. This design is chosen as the house prices in our data are not evenly distributed among all the categories. We can see from Figure \ref{fig:price-class}, price class 4 (ranging from (500k, 700k]) has the most number of observation falls into while very few observations belong to category 1 or 2. If accuracy measure is used for evaluating the algorithm, it will be prone to predicting category 4 or 5 to achieve a higher accuracy result while not learn the data well. Therefore loss function, which evaluates the performance of the algorithm based on its score on categorical cross entropy, is a more reliable measure for our use case. 
 
@@ -112,7 +110,7 @@ house_c %>%
   scale_x_continuous(breaks = seq(1, 10,1))
 ```
 
-## Optimization procedure 
+### Optimization procedure 
 
 We considered three prominent gradient descent algorithms:
 
@@ -133,11 +131,11 @@ kable(tibble(Hyperparameter = c("dense_unit1", "dense_unit2",
        caption = "\\label{tab:hyper-para} The grid value of parameter used in hyperparameter tuning")
 ```
 
-# Section 3: Results and Discussion
+## Section 3: Results and Discussion
 
 The hypterparameter tuning on the grid defined above is implemented through `tfruns` package. This package allows for organising the training parameters and evaluation results into a dataframe format and create a shiny app to view each training process. Figure \ref{fig:best} provides a screenshot of the best result from the training. The parameter assocaited with the best validation result is presented in Table \ref{tab:best-para}
 
-```{r best, fig.cap="Screenshot of the training with the lowest validation loss."}
+```{r best, fig.cap="Screenshot of the training with the lowest validation loss.", fig.height=1}
 include_graphics("figure/best.png")
 ```
 
@@ -161,13 +159,13 @@ The neural network is not competitive as the multinomial logistic model from our
 
 The second reason is due to the limitation of computation power. There are still some parameters we are keeping constant through the hyperparameter tuning, for example, learning rate. There are also more activation function such as LeakyRELU that we could try to see if better performance can be achieved. 
 
-# Section 4: Conclusion
+## Section 4: Conclusion
 
 A random guess in our classification would have been 10%. Our neural network performed with a 50.51% accuracy in classifying house prices into the 10 categories of ranges. The mulitnomial logistic regression performed with a 51.27% accuracy.  
 Our network accuracy may have increased if we had the time to allow for a full set of hyperparameter tuning, yet we were also limited by the small feature space in our data. The latter could have been overcome by utilising the variable for seller denoting the agency, and also by utilising the full dataset rather than the reduced as mentioned in our experiment section.  
 A key takeaway from this project is that neural networks are most useful in datasets with significant feature space, for their ability to transform and make use of the optimum combination of features.  
 
-# References
+## References
 
 Sebastian Ruder (2016). An overview of gradient descent optimisation algorithms. arXiv preprint arXiv:1609.04747.
 

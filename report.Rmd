@@ -151,7 +151,7 @@ The metrics for evaluation is the loss function rather than the accuracy result.
 
 
 
-```{r price-class}
+```{r price-class, fig.height=2}
 load("data/house_c.rda")
 house_c %>% 
   ggplot(aes(x = price_class)) + 

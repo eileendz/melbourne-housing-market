@@ -1,9 +1,8 @@
 ---
-title: "Melbourne housing market: Price modelling"
-subtitle: "ETC3555: Report"
+title: "ETC3555 Melbourne housing market: Price modelling"
 author: "Jack Cameron, Eileen Dzhumasheva, Huize Zhang"
-date: "14/10/2019"
 output: pdf_document
+geometry: margin=2cm
 ---
 
 # Introduction
@@ -121,7 +120,7 @@ We proceed by scaling and centering our data, transforming factors using one-hot
 The metrics for evaluation is the loss function rather than the accuracy result. This design is chosen as the house prices in our data are not evenly distributed among all the categories. We can see from Figure \ref{fig:price-class}, price class 4 (ranging from (500k, 700k]) has the most number of observation falls into while very few observations belong to category 1 or 2. If accuracy measure is used for evaluating the algorithm, it will be prone to predicting category 4 or 5 to achieve a higher accuracy result while not learn the data well. Therefore loss function, which evaluates the performance of the algorithm based on its score on categorical cross entropy, is a more reliable measure for our use case. 
 
 
-```{r price-class}
+```{r price-class, fig.height=2}
 load("data/house_c.rda")
 house_c %>% 
   ggplot(aes(x = price_class)) + 
@@ -171,15 +170,12 @@ This model is then performed on the test set and the prediction matrix is presen
 
 ```{r pred-matrix-nn}
 load("data/pred_nn")
-load("data/pred_mnl")
-
-pred_nn
-pred_mnl
-
-
+knitr::kable(pred_nn,caption ="Neural netowrk prediction matrix")
 ```
-
-
+```{r pred-matrix-mnl}
+load("data/pred_mnl")
+knitr::kable(pred_mnl,caption="Multinomial logistic prediction matrix")
+```
 
 The neural network is not competitive as the multinomial logistic model from our result. Two reasons could explain this. Firstly. the faeture space (277 variables) of the current dataset is relatively small. This could cause we are not able to build more sophisticated neural network for it to work it magic. Also later we realise the `seller` variable is the name of the selling agency rather than the name of the individual seller. One may expect the selling price of a house could related to the selling agency and this variable could also be added into the neural network. Also there is a larger house price dataset in kaggle and it provides additional information related to the house. 
 
@@ -190,12 +186,11 @@ The second reason is due to the limitation of computation power. There are still
 
 # Section 4: Conclusion
 
-This includes a summary of the findings.
+A random guess in our classification would have been 10%. Our neural network performed with a 50.51% accuracy in classifying house prices into the 10 categories of ranges. The mulitnomial logistic regression performed with a 51.27% accuracy.  
+Our network accuracy may have increased if we had the time to allow for a full set of hyperparameter tuning, yet we were also limited by the small feature space in our data. The latter could have been overcome by utilising the variable for seller denoting the agency, and also by utilising the full dataset rather than the reduced as mentioned in our experiment section.  
+A key takeaway from this project is that neural networks are most useful in datasets with significant feature space, for their ability to transform and make use of the optimum combination of features.  
 
 Residential versus commerical buildings 
-
-
-# Appendix
 
 # References
 

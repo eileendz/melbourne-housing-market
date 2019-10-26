@@ -1,5 +1,5 @@
 ---
-title: "Melbourne housing market: Price modelling ETC3555 report"
+title: "ETC3555 Melbourne housing market: Price modelling"
 author: "Jack Cameron, Eileen Dzhumasheva, Huize Zhang"
 output: pdf_document
 geometry: margin=2cm
@@ -182,12 +182,11 @@ This model is then performed on the test set and the prediction matrix is presen
 
 ```{r pred-matrix-nn}
 load("data/pred_nn")
+knitr::kable(pred_nn,caption ="Neural netowrk prediction matrix")
+```
+```{r pred-matrix-mnl}
 load("data/pred_mnl")
-
-pred_nn
-pred_mnl
-
-
+knitr::kable(pred_mnl,caption="Multinomial logistic prediction matrix")
 ```
 
 The neural network is not competitive as the multinomial logistic model from our result. Two reasons could explain this. Firstly. the faeture space (277 variables) of the current dataset is relatively small. This could cause we are not able to build more sophisticated neural network for it to work it magic. Also later we realise the `seller` variable is the name of the selling agency rather than the name of the individual seller. One may expect the selling price of a house could related to the selling agency and this variable could also be added into the neural network. Also there is a larger house price dataset in kaggle and it provides additional information related to the house. 
@@ -203,17 +202,7 @@ A random guess in our classification would have been 10%. Our neural network per
 Our network accuracy may have increased if we had the time to allow for a full set of hyperparameter tuning, yet we were also limited by the small feature space in our data. The latter could have been overcome by utilising the variable for seller denoting the agency, and also by utilising the full dataset rather than the reduced as mentioned in our experiment section.  
 A key takeaway from this project is that neural networks are most useful in datasets with significant feature space, for their ability to transform and make use of the optimum combination of features.  
 
-
-
-
-
-
-This includes a summary of the findings.
-
 Residential versus commerical buildings 
-
-
-# Appendix
 
 # References
 

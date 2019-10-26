@@ -31,9 +31,9 @@ Model selection was born from discussion of our objectives, and consideration of
 <!-- how they control the complexity/flexibility of the algorithm -->
 <!-- does the method scale with large data sets, etc -->
 
-For the problem of predicting house prices for private sales, a theoretical unknown target function exists, but we don't believe any practical target function exists. The simple rationale is that private sales are too heavily dependent on subjective characteristics of how the buyer buys, and how the seller sells, to be accurately approximated in any qualitative or quantitative sense. With this said, our unknown target distribution is therefore the best approximation to such an issue. In considering the modelling approach to take, we reflected on the real world application of such a tool. Presently, when houses are put up for sale they list with an expected range. Similarly, when houses are bid upon, they are done so with nominal amounts of money, such as $10,000 increments. Given such use cases it seems misguided to attempt to price a house at an exact dollar figure, and more sensible to attempt to classify house prices into ranges of prices.  
 
-After narrowing down our approach, we consider a neural network for the purpose of this project, and an appropriate benchmark model reflecting our need.  
+For the problem of predicting house prices for private sales, a theoretical unknown target function exists, but we don't believe any practical target function exists. The simple rationale is that private sales are too heavily dependent on subjective characteristics of how the buyer buys, and how the seller sells, to be accurately approximated in any qualitative or quantitative sense. With this said, our unknown target distribution is therefore the best approximation to such an issue. In considering the modelling approach to take, we reflected on the real world application of such a tool. Presently, when houses are put up for sale they list with an expected range. Similarly, when houses are bid upon, they are done so with nominal amounts of money, such as $10,000 increments. Given such use cases it seems misguided to attempt to price a house at an exact dollar figure, and more sensible to attempt to classify house prices into ranges of prices. After narrowing down our approach, we consider a neural net for the purpose of this project, and an appropriate benchmark model reflecting our need.  
+
 
 For the benchmark we considered the following models  
 
@@ -52,32 +52,20 @@ Kauko (2003) has provided an overview on current neural network application on p
 knitr::include_graphics("nn.png")
 ```
 
-### Dropout & Batch normalisation
 
-To avoid overfitting of the data, several regularisation methods are used. Dropout rate is used before each dense layer and is tuning parameter in the grid serach, which will be elaborated in section 3. Batch normalisation is then performed before each dense layer. This process is necessary because it will normalise the extreme large values from the previous layer so that the training process can speed up. Batch normalisation is added after the dropout layer since it makes more sense to only normalise the neurals that will be supplied into the next layer. 
+Two activation functions, Relu and Tanh are chosen to tune for the middle layers. Relu has its advantage of outputting zeros for negative input, which would be helpful to avoid overfitting. Also, Relu function will increase to infinity at asymptotic and this property allows the relevant weight to be fully updated when the input gets larger. Tanh is also considered because it is  an symmetric activation function that will provide symmetric result for positive and negative inputs (thus don't need normalisation) but unlike relu function, it saturates at asymptotic, which may cause large inputs not being able to get updated. The activation function for the final layer is softmax as this is the appropriate function for multi-level classification as it bounds probability ranges between 0-1, and the sum of probability for inclusion into each category will sum to 1. 
 
-Regularisation is also applied in each layer with learning rate being a hyper-parameter to tune. 
-### Activation function
+To avoid overfitting of the data, dropout and l2 regularisation are used. Dropout rate is used before each dense layer and is a tuning parameter in the grid serach. L2 regularisation is also applied in each layer to avoid overfitting and a learning rate of 1e-3 is used. 
 
-The activation function for the middle layers are RELU function. This choice is made based on two considerations. 
 
-1) relu function produces zero output for negative input, this would be helpful to avoid overfitting. 
-
-2) unlike tanh function that  will saturate at asymptotic, which means the weight will not be updated much when the input neural has a large value, on the other hand, Relu function will will increase to infinity. This property of relu allows the relevant weight to be updated when the input gets larger. And the potential drawback of getting extreme large output is overcame by batch normalisation discussed before. 
-
-The activation function for the final layer is softmax because this is the appropriate function for multi-level classification. 
-
-The activation function for the final layer is softmax as this is the appropriate function for multi-level classification as it bounds probability ranges between 0-1, and the sum of probability for inclusion into each category will sum to 1. 
-
-### L2 regulariser
-
-To avoid overfitting of the data, several regularisation methods are used. Dropout rate is used before each dense layer. One thing to notice is that the dropout rate is added before the batch normalisation because otherwise the normalisation will be based on the full data while part of them will be dropped out before supplied to the next layer. Regularisation is also applied in each layer with learning rate being a hyper-parameter to tune. 
-
-### Loss function
+Batch normalisation is also performed before each dense layer. This process is necessary because it will normalise the extreme large values from the previous layer so that the training process can speed up. Batch normalisation is added after the dropout layer since it makes more sense to only normalise the neurals that will be supplied into the next layer. 
 
 The loss function used is the categorical cross entropy, which is the only option for multi-class classification. 
 
-Our hyperparameters were tuned for tuned for using grid-search, but due to computation issues stemming from the number of iterations the search had to perform we were only able to proceed half way through this tuning procedure. Discussion of the ranges tuned for each hypterparamter will be included in our experimentation section. 
+
+Our hyperparameters were tuned using grid-search, but due to computation issues stemming from the number of iterations the search had to perform we were only able to proceed half way through this tuning procedure. Discussion of the ranges tuned for each hypterparamter will be included in our experimentation section. 
+
+
 As for the scaling of our model, we believe given a larger data-set the model would have actually performed better. We had a relatively small feature space to run a neural net, and loss and accuracy may have improved given this was expanded. Performance of the multinomial logistic regression would not be expected to have changed, but the computation time would have significantly grown.
 
 # Section 2: Experiment
@@ -132,6 +120,7 @@ kable(tibble(Hyperparameter = c("dense_unit1", "dense_unit2",
        Value = c("(256, 128)", "(128, 64, 32)", "(0,0.1, 0.2)", "(64, 128, 256, 512)", "(relu, tanh)")),
        caption = "\\label{tab:hyper-para} The grid value of parameter used in hyperparameter tuning")
 ```
+
 
 # Section 3: Results and Discussion
 

@@ -193,9 +193,6 @@ The neural network is not competitive as the multinomial logistic model from our
 
 The second reason is due to the limitation of computation power. There are still some parameters we are keeping constant through the hyperparameter tuning, for example, learning rate. There are also more activation function such as LeakyRELU that we could try to see if better performance can be achieved. 
 
-
-
-
 # Section 4: Conclusion
 
 A random guess in our classification would have been 10%. Our neural network performed with a 50.51% accuracy in classifying house prices into the 10 categories of ranges. The mulitnomial logistic regression performed with a 51.27% accuracy.  

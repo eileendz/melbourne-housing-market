@@ -43,7 +43,7 @@ For the benchmark we considered the following models
 - Naive Bayes
 - Multi-class logistic regression
 
-OLS regression was ruled out for it's distributional assumptions which did not fit our dataset, and the desire to choose a model with inherent classification abilities. Naive Bayes was considered for it's ease of implementation and understanding, but ruled out for preference of a more complex model. The choice ultimately came down to random forests and multi-class, or multi-nomial logistic regression. The latter was chosen for it's relatively simple implementation, computational speed, and well documented success in multi-class classification. 
+OLS regression was ruled out for it's distributional assumptions which did not fit our dataset, and the desire to choose a model with inherent classification abilities. Naive Bayes was considered for it's ease of implementation and understanding, but ruled out for preference of a more complex model. The choice ultimately came down to random forests and multi-class, or multi-nominal logistic regression. The latter was chosen for it's relatively simple implementation, computational speed, and well documented success in multi-class classification. 
 
 For our neural network, the classification approach simplified things as we were familiar with its implementation from the lecture and tutorial material. The structure and considerations will now be introduced.  
 
@@ -56,7 +56,7 @@ knitr::include_graphics("nn.png")
 
 Two activation functions, Relu and Tanh are chosen to tune for the middle layers. Relu has its advantage of outputting zeros for negative input, which would be helpful to avoid overfitting. Also, Relu function will increase to infinity at asymptotic and this property allows the relevant weight to be fully updated when the input gets larger. Tanh is also considered because it is  an symmetric activation function that will provide symmetric result for positive and negative inputs (thus don't need normalisation) but unlike relu function, it saturates at asymptotic, which may cause large inputs not being able to get updated. The activation function for the final layer is softmax as this is the appropriate function for multi-level classification as it bounds probability ranges between 0-1, and the sum of probability for inclusion into each category will sum to 1. 
 
-To further avoid overfitting of the data, dropout and l2 regularisation are used. Dropout rate is used before each dense layer and is a tuning parameter in the grid serach. L2 regularisation is also applied in each layer to avoid overfitting and a learning rate of 1e-3 is used. Batch normalisation is also performed before each dense layer. This process is necessary because it will normalise the extreme large values from the previous layer so that the training process can speed up. Batch normalisation is added after the dropout layer since it makes more sense to only normalise the neurals that will be supplied into the next layer. The loss function used is the categorical cross entropy, which is the only option for multi-class classification. Our hyperparameters were tuned using grid-search, but due to computation issues stemming from the number of iterations the search had to perform we were only able to proceed half way through this tuning procedure. Discussion of the ranges tuned for each hypterparamter will be included in our experimentation section. 
+To further avoid overfitting of the data, dropout and l2 regularisation are used. Dropout rate is used before each dense layer and is a tuning parameter in the grid search. L2 regularisation is also applied in each layer to avoid overfitting and a learning rate of 1e-3 is used. Batch normalisation is also performed before each dense layer. This process is necessary because it will normalise the extreme large values from the previous layer so that the training process can speed up. Batch normalisation is added after the dropout layer since it makes more sense to only normalise the neurals that will be supplied into the next layer. The loss function used is the categorical cross entropy, which is the only option for multi-class classification. Our hyperparameters were tuned using grid-search, but due to computation issues stemming from the number of iterations the search had to perform we were only able to proceed half way through this tuning procedure. Discussion of the ranges tuned for each hypterparamter will be included in our experimentation section. 
 
 
 As for the scaling of our model, we believe given a larger data-set the model would have actually performed better. We had a relatively small feature space to run a neural net, and loss and accuracy may have improved given this was expanded. Performance of the multinomial logistic regression would not be expected to have changed, but the computation time would have significantly grown.
@@ -71,13 +71,13 @@ Our dataset contained information on 63,013 house sales scraped from publicly av
 
 We first convert our regression problem into a classification problem by transforming house price into 10 categories: (0, 100k], (100k, 300k], (300k, 500k] ... (1500k, 1700k], (1700k, $\infty$) and this allows us to perform neural network on a multi-class classification problem, which is much easier than prediction.
 
-We seperate our dataset into a 90:10 training-test split. The training is done on the 90% of the data with 20% as validation set and the best model fit is then performed on the test set to get the accuracy result. 
+We separate our dataset into a 90:10 training-test split. The training is done on the 90% of the data with 20% as validation set and the best model fit is then performed on the test set to get the accuracy result. 
 
-The data is first scaled and centred before sending into the neural network for training and normalisation is performed before each dense layer. This normalisation is necessary because it helps to speed up the converging process by normalising the extreme large value outputted from the previous layer. 
+The data is first scaled and centered before sending into the neural network for training and normalisation is performed before each dense layer. This normalisation is necessary because it helps to speed up the converging process by normalising the extreme large value outputted from the previous layer. 
 
 We proceed by scaling and centering our data, transforming factors using one-hot encoding to increase feature space and allow our algorithm to improve in prediction, and we subset our data into sets of 90% training and 10% test.
 
-<!-- The optimisation used is ADAM. Different optimiser such as Root Mean Square Propagation (RMSPROP) or Random Gradient Descent (RGD) could be used for tuning but theoratically ADAM is believed to have better performance since it incorporates the momentum from RMSPROP to RGD The learning rate for ADAM is treated as a hyperparameter to tune.  -->
+<!-- The optimisation used is ADAM. Different optimiser such as Root Mean Square Propagation (RMSPROP) or Random Gradient Descent (RGD) could be used for tuning but theoretically ADAM is believed to have better performance since it incorporates the momentum from RMSPROP to RGD The learning rate for ADAM is treated as a hyperparameter to tune.  -->
 
 ### Evaluation metric
 
@@ -99,11 +99,11 @@ We considered three prominent gradient descent algorithms:
 2. RGD with momentum
 3. Adaptive Moment Estimation (Adam)
 
-Adam is choosen as the optimiser for the project as it combines the strengths of RMSProp and momentum (Kingma, D et al). 
+Adam is chosen as the optimiser for the project as it combines the strengths of RMSProp and momentum (Kingma, D et al). 
 
 In the optimisation procedure, we use `epoch = 500` and impose early stopping with `patience = 20` in our network structure. This design is chosen because it allows the algorithm to continue to update if necessary and a small epoch will force the algorithm to stop before it is fully updated. 
 
-Hyper-parameter tuning is utilised to find the best combination of parameters given the neurual network architecture defined. Due to the limitation of computational power, a small grid search is implemented with the grid value as shown in Table \ref{tab:hyper-para}. Dense unit starts from 256 as the largest because there are only 277 variable in our feature space. In this project, we dont consider the architecture of first expanding the feature space and then reducing it. Zero is included in the dropout rate is because a RELU activation function would output zeros if the input is negative. This feature of RELU function can be viewed as working as dropout rate. Batch size is also included in the tuning parameter. 
+Hyper-parameter tuning is utilised to find the best combination of parameters given the neural network architecture defined. Due to the limitation of computational power, a small grid search is implemented with the grid value as shown in Table \ref{tab:hyper-para}. Dense unit starts from 256 as the largest because there are only 277 variable in our feature space. In this project, we do not consider the architecture of first expanding the feature space and then reducing it. Zero is included in the dropout rate is because a RELU activation function would output zeros if the input is negative. This feature of RELU function can be viewed as working as dropout rate. Batch size is also included in the tuning parameter. 
 
 ```{r}
 kable(tibble(Hyperparameter = c("dense_unit1", "dense_unit2", 
@@ -114,7 +114,7 @@ kable(tibble(Hyperparameter = c("dense_unit1", "dense_unit2",
 
 ## Section 3: Results and Discussion
 
-The hypterparameter tuning on the grid defined above is implemented through `tfruns` package. This package allows for organising the training parameters and evaluation results into a dataframe format and create a shiny app to view each training process. Figure \ref{fig:best} provides a screenshot of the best result from the training. The parameter assocaited with the best validation result is presented in Table \ref{tab:best-para}
+The hypterparameter tuning on the grid defined above is implemented through `tfruns` package. This package allows for organising the training parameters and evaluation results into a dataframe format and create a shiny app to view each training process. Figure \ref{fig:best} provides a screenshot of the best result from the training. The parameter associated with the best validation result is presented in Table \ref{tab:best-para}
 
 ```{r best, fig.cap="Screenshot of the training with the lowest validation loss.", fig.height=1}
 include_graphics("figure/best.png")
@@ -125,7 +125,7 @@ kable(tibble(Hyperparameter = c("dense_unit1", "dense_unit2", "dropout", "batch_
        Value = c(256, 64, 0.2, 256, "relu")),caption = "\\label{tab:best-para} Best parameters")
 ```
 
-This model is then performed on the test set and the prediction matrix is presented in Table 3. The accuracy of neural network algorithm is 50%. The multinomial logistic model is also performedon the test set and the accuracy is 51%. Associated prediction matrix is presented in Table 4. 
+This model is then performed on the test set and the prediction matrix is presented in Table 3. The accuracy of neural network algorithm is 50%. The multinational logistic model is also performed on the test set and the accuracy is 51%. Associated prediction matrix is presented in Table 4. 
 ```{r}
 load("data/pred_nn")
 load("data/pred_mnl")

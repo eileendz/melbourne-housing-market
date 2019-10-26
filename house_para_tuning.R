@@ -10,10 +10,10 @@ runs <- tuning_run("house.R", flags = list(
 
 # may want to try if three layer is good but doubt about that
 
-# run_result <- ls_runs() %>% unnest(metrics) %>% 
-#   dplyr::arrange(metric_val_loss) %>% 
-#   select(metric_loss, metric_acc, metric_val_loss, metric_val_acc, flag_dropout, 
-#          flag_batch_size, flag_activation, flag_dense_unit1, flag_dense_unit2 ,run_dir)
+run_result <- ls_runs(latest_n = 108) %>% unnest(metrics) %>%
+  dplyr::arrange(metric_val_loss) %>%
+  select(metric_loss, metric_acc, metric_val_loss, metric_val_acc, flag_dropout,
+         flag_batch_size, flag_activation, flag_dense_unit1, flag_dense_unit2 ,run_dir)
 
 
 view_run("runs/2019-10-22T12-51-42Z") 

@@ -15,7 +15,12 @@ library(tidyverse)
 knitr::opts_chunk$set(warning = FALSE, message = FALSE, 
   comment = NA, dpi = 300, echo = FALSE,
   fig.align = "center", out.width = "80%", cache = FALSE)
+
+library(tidyverse)
+library(knitr)
+library(tfruns)
 ```
+
 
 # Section 1: Model  
 Model selection was born from discussion of our objectives, and consideration of our dataset.
@@ -42,6 +47,33 @@ For the benchmark we considered the following models
 OLS regression was ruled out for it's distributional assumptions which did not fit our dataset, and the desire to choose a model with inherent classification abilities. Naive Bayes was considered for it's ease of implementation and understanding, but ruled out for preference of a more complex model. The choice ultimately came down to random forests and multi-class, or multi-nomial logistic regression. The latter was chosen for it's relatively simple implementation, computational speed, and well documented success in multi-class classification. 
 
 For our neural net, the classification approach simplified things as we were familiar with its implementation from the lecture and tutorial material. The structure and considerations will now be introduced.  
+
+[Sherry's part that is relevant to the nn architecture]
+Kauko (2003) has provided an overview on current neural network application on predicting  house price and introduced some advanced methods like self-organising map(SOM) and learning vector quantization (LVQ). However, there is no pre-trained architecture for house price forecasting and thus, we build our own two layer deep neural network from scratch. Due to the size of the data (48k observations with 277 features), the architecture is a deep neural network with two hidden layer. A graphic illustration of the architecture is shown in Figure \ref{fig:architecture}. A three hidden layer architecture is also considered but due to the extra computational burden associated with training and hyperparameter training, it is not implemented in this project. 
+
+
+```{r}
+#include_graphics()
+```
+
+The activation function for the middle layers are relu function. This choice is made based on two considerations. 
+
+1) relu function produces zero output for negative input, this would be helpful to avoid overfitting because a proportion of the features will be set to zeros. 
+
+2) unlike tanh function that  will saturate at asymptotic, which means the weight will not be updated much when the input neural has a large value, on the other hand, Relu function will will increase to infinity. This property of relu allows the relevant weight to be updated when the input gets larger. And the potential drawback of getting extreme large output is overcame by batch normalisation discussed before. 
+
+The activation function for the final layer is softmax because this is the appropriate function for multi-level classification. 
+
+To avoid overfitting of the data, several regularisation methods are used. Dropout rate is used before each dense layer. One thing to notice is that the dropout rate is added before the batch normalisation because otherwise the normalisation will be based on the full data while part of them will be dropped out before supplied to the next layer. Regularisation is also applied in each layer with learning rate being a hyper-parameter to tune. 
+
+Early stop is also used to allow for more efficient updating on the parameter. We set epoch at a large fixed value of 500 and use `patient = 20` in the early stop in our model structure. This design allows the neural network to keep updating if needed while not wasting omputational power and time when the updates become slow.
+
+The optimisation is done with an ADAM optimiser. Different optimiser such as RMSPROP or RGD could be used for tuning while theoratically ADAM is believed to have better performance since it incorporates the momentum from RMSPROP to RGD The learning rate for ADAM is treated as a hyperparameter to tune. 
+
+The loss function used is the categorical cross entropy, which is the only option for multi-class classification. 
+
+xxx
+
 We used two dense layers and optimized for node sizes for each.
 <!-- WHY 2 dense layers?-->
 A dropout layer preceeding batch normalization to increase computation speed.
@@ -81,7 +113,8 @@ Our dataset contained information on 63,013 house sales scraped from publicly av
 
 We first convert our regression problem into a classification problem by transforming house price into 10 categories: (0, 100k], (100k, 300k], (300k, 500k] ... (1500k, 1700k], (1700k, $\infty$) and this allows us to perform neural network on a multi-class classification problem, which is much easier than prediction. Our motivation for this is also because houses priced in the millions often have ___ characteristics that...
 
-We seperate our dataset into a 90:10 training-test split, and perform all of our model evaluations on the test set. 
+We seperate our dataset into a 90:10 training-test split. The training is done on the 90% of the data with 20% as validation set and the best model fit is then performed on the test set to get the accuracy result. 
+
 
 Kauko[reference] has provided an overview on current neural network application for predicting house prices and introduced some advanced methods including self-organising map (SOM) and learning vector quantization (LVQ). However there is no pre-trained architecture for house price forecasting and thus we build our own two layer deep neural network from scratch. Based on the size of our data (48k observations with 277 features) and the project goal (classifying house price into 10 categories), it is not sensible to construct a neural network with more than 4 layers. Neural network with 3 layers may also work, but adding an additional layer increases the computational requirements for the tuning of a model that was already too heavy for our computers to handle. This is a possible extension of our study.
 
@@ -93,7 +126,7 @@ We proceed by scaling and centering our data, transforming factors using one-hot
 
 In running our model normalisation is performed before each dense layer. This normalisation is necessary because it helps to speed up the converging process by normalising the extreme large value outputted from the previous layer. 
 
-The activation function for the middle layers are relu function. This choice is made based on two considerations. 
+
 
 1) relu function produces zero output for negative input, this would be helpful to avoid overfitting because a proportion of the features will be set to zeros. 
 
@@ -115,6 +148,7 @@ The metrics for evaluation is the loss function rather than the accuracy result.
 <!-- how to select benchmark model -->
 
 
+
 ```{r price-class}
 load("data/house_c.rda")
 house_c %>% 
@@ -133,7 +167,36 @@ We considered three prominent gradient descent algorithms:
 From these, we select Adam as it combines the strengths of RMSProp and momentum (Kingma, D et al). Adam stores an exponentially decaying average of past squared gradients like RMSprop, while also keeping an exponentially decaying average of past gradients, similar to momentum (Heusel, M et al). Whereas momentum can be seen as a ball running down a slope, Adam behaves like a heavy ball with friction, which prefers flat minima in the error surface.
 
 # Section 3: Results and Discussion
-This includes for example graphs and tables, as well as a discussion of the results. You should also present your model fitting, diagnostics, etc.
+
+The hypterparameter tuning on the grid defined above is implemented through `tfruns` package. This package allows for organising the training parameters and evaluation results into a dataframe format and create a shiny app to view each training process. Figure \ref{fig:best} provides a screenshot of the best result from the training. The parameter assocaited with the best validation result is presented in Table \ref{tab:best-para}
+
+```{r best, fig.cap="Screenshot of the training with the lowest validation loss."}
+include_graphics("figure/best.png")
+```
+
+```{r best-para}
+kable(tibble(hyperparameter = c("dense_unit1", "dense_unit2", "dropout", "batch_size", "activation"),
+       value = c(256, 64, 0.2, 256, "relu")),caption = "\\label{tab:best-para}")
+```
+
+This model is then performed on the test set and the prediction matrix is presented in Table \ref{tab:pred-matrix-nn}. The accuracy of neural network algorithm is 50%. The multinomial logistic model is also performedon the test set and the accuracy is 51%. Associated prediction matrix is presented in Table \ref{tab:pred-matrix-mnl}. 
+
+```{r pred-matrix-nn}
+load("data/pred_nn")
+load("data/pred_mnl")
+
+pred_nn
+pred_mnl
+
+
+```
+
+
+
+The neural network is not competitive as the multinomial logistic model from our result. Two reasons could explain this. Firstly. the faeture space (277 variables) of the current dataset is relatively small. This could cause we are not able to build more sophisticated neural network for it to work it magic. Also later we realise the `seller` variable is the name of the selling agency rather than the name of the individual seller. One may expect the selling price of a house could related to the selling agency and this variable could also be added into the neural network. Also there is a larger house price dataset in kaggle and it provides additional information related to the house. 
+
+The second reason is due to the limitation of computation power. There are still some parameters we are keeping constant through the hyperparameter tuning, for example, learning rate. There are also more activation function such as LeakyRELU that we could try to see if better performance can be achieved. 
+
 
 
 
@@ -153,3 +216,5 @@ Sebastian Ruder (2016). An overview of gradient descent optimisation algorithms.
 Kingma, D. P., & Ba, J. L. (2015). Adam: a Method for Stochastic Optimization. International Conference on Learning Representations, 1–13.
 
 Heusel, M., Ramsauer, H., Unterthiner, T., Nessler, B., & Hochreiter, S. (2017). GANs Trained by a Two Time-Scale Update Rule Converge to a Local Nash Equilibrium. In Advances in Neural Information Processing Systems 30 (NIPS 2017).
+
+Kauko, T. (2003). On current neural network applications involving spatial modelling of property prices. Journal of housing and the built environment, 18(2), 159-181.

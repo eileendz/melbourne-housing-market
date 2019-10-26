@@ -8,6 +8,7 @@ mlogit <- multinom(price_class ~ rooms + type + method + postcode + distance + c
 
 pred <- predict (mlogit, test, "class")
 
-table(pred, test$price_class)
+pred_mnl <- table(pred, test$price_class)
+save(pred_mnl, file = "data/pred_mnl")
 
 mean(as.character(pred) != as.character(test$price_class))

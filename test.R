@@ -33,5 +33,5 @@ eval$acc
 
 predicted_class <- model %>% predict_classes(as.matrix(test_x))
 
-table(predicted_class, test$price_class)
-
+pred_nn <- table(predicted_class, test$price_class)
+save(pred_nn, file = "data/pred_nn")

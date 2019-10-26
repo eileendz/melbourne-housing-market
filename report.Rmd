@@ -31,70 +31,67 @@ Model selection was born from discussion of our objectives, and consideration of
 <!-- how they control the complexity/flexibility of the algorithm -->
 <!-- does the method scale with large data sets, etc -->
 
-## The Learning Problem
-For the problem of predicting house prices for private sales, a theoretical unknown target function exists, but we don't believe any practical target function exists. The simple rationale is that private sales are too heavily dependent on subjective characteristics of how the buyer buys, and how the seller sells, to be accurately approximated in any qualitative or quantitative sense.  
-With this said, our unknown target distribution is therefore the best approximation to such an issue. In considering the modelling approach to take, we reflected on the real world application of such a tool. Presently, when houses are put up for sale they list with an expected range. Similarly, when houses are bid upon, they are done so with nominal amounts of money, such as $10,000 increments. Given such use cases it seems misguided to attempt to price a house at an exact dollar figure, and more sensible to attempt to classify house prices into ranges of prices.  
+For the problem of predicting house prices for private sales, a theoretical unknown target function exists, but we don't believe any practical target function exists. The simple rationale is that private sales are too heavily dependent on subjective characteristics of how the buyer buys, and how the seller sells, to be accurately approximated in any qualitative or quantitative sense. With this said, our unknown target distribution is therefore the best approximation to such an issue. In considering the modelling approach to take, we reflected on the real world application of such a tool. Presently, when houses are put up for sale they list with an expected range. Similarly, when houses are bid upon, they are done so with nominal amounts of money, such as $10,000 increments. Given such use cases it seems misguided to attempt to price a house at an exact dollar figure, and more sensible to attempt to classify house prices into ranges of prices.  
 
 After narrowing down our approach, we consider a neural net for the purpose of this project, and an appropriate benchmark model reflecting our need.  
+
 For the benchmark we considered the following models  
 
-* OLS Regression with range classification in post-estimation  
-* Decision Tree / Random forests  
-* Naive Bayes  
-* Multi-class logistic regression
+- OLS Regression with range classification in post-estimation
+- Decision Tree / Random forests
+- Naive Bayes
+- Multi-class logistic regression
 
 OLS regression was ruled out for it's distributional assumptions which did not fit our dataset, and the desire to choose a model with inherent classification abilities. Naive Bayes was considered for it's ease of implementation and understanding, but ruled out for preference of a more complex model. The choice ultimately came down to random forests and multi-class, or multi-nomial logistic regression. The latter was chosen for it's relatively simple implementation, computational speed, and well documented success in multi-class classification. 
 
+
 For our neural net, the classification approach simplified things as we were familiar with its implementation from the lecture and tutorial material. The structure and considerations will now be introduced.  
 
-[Sherry's part that is relevant to the nn architecture]
 Kauko (2003) has provided an overview on current neural network application on predicting  house price and introduced some advanced methods like self-organising map(SOM) and learning vector quantization (LVQ). However, there is no pre-trained architecture for house price forecasting and thus, we build our own two layer deep neural network from scratch. Due to the size of the data (48k observations with 277 features), the architecture is a deep neural network with two hidden layer. A graphic illustration of the architecture is shown in Figure \ref{fig:architecture}. A three hidden layer architecture is also considered but due to the extra computational burden associated with training and hyperparameter training, it is not implemented in this project. 
 
 
+```{r architecture, fig.cap="Neural network architecture."}
+knitr::include_graphics("nn.png")
+```
 
-The activation function for the middle layers are relu function. This choice is made based on two considerations. 
+### Dropout & Batch normalisation
 
-1) relu function produces zero output for negative input, this would be helpful to avoid overfitting because a proportion of the features will be set to zeros. 
+To avoid overfitting of the data, several regularisation methods are used. Dropout rate is used before each dense layer and is tuning parameter in the grid serach, which will be elaborated in section 3. Batch normalisation is then performed before each dense layer. This process is necessary because it will normalise the extreme large values from the previous layer so that the training process can speed up. Batch normalisation is added after the dropout layer since it makes more sense to only normalise the neurals that will be supplied into the next layer. 
+
+
+
+Regularisation is also applied in each layer with learning rate being a hyper-parameter to tune. 
+
+
+
+### Activation function
+
+The activation function for the middle layers are RELU function. This choice is made based on two considerations. 
+
+1) relu function produces zero output for negative input, this would be helpful to avoid overfitting. 
 
 2) unlike tanh function that  will saturate at asymptotic, which means the weight will not be updated much when the input neural has a large value, on the other hand, Relu function will will increase to infinity. This property of relu allows the relevant weight to be updated when the input gets larger. And the potential drawback of getting extreme large output is overcame by batch normalisation discussed before. 
 
 The activation function for the final layer is softmax because this is the appropriate function for multi-level classification. 
 
+
+
+The activation function for the final layer is softmax as this is the appropriate function for multi-level classification as it bounds probability ranges between 0-1, and the sum of probability for inclusion into each category will sum to 1. 
+
+
+### L2 regulariser
+
 To avoid overfitting of the data, several regularisation methods are used. Dropout rate is used before each dense layer. One thing to notice is that the dropout rate is added before the batch normalisation because otherwise the normalisation will be based on the full data while part of them will be dropped out before supplied to the next layer. Regularisation is also applied in each layer with learning rate being a hyper-parameter to tune. 
 
-Early stop is also used to allow for more efficient updating on the parameter. We set epoch at a large fixed value of 500 and use `patient = 20` in the early stop in our model structure. This design allows the neural network to keep updating if needed while not wasting omputational power and time when the updates become slow.
-
-The optimisation is done with an ADAM optimiser. Different optimiser such as RMSPROP or RGD could be used for tuning while theoratically ADAM is believed to have better performance since it incorporates the momentum from RMSPROP to RGD The learning rate for ADAM is treated as a hyperparameter to tune. 
+### Loss function
 
 The loss function used is the categorical cross entropy, which is the only option for multi-class classification. 
 
-xxx
 
-We used two dense layers and optimized for node sizes for each.
-<!-- WHY 2 dense layers?-->
-A dropout layer preceeding batch normalization to increase computation speed.
-<!-- This the only reason? -->
-Activation functions considered were Relu, Leaky-Relu, and Tanh for hidden layers, the latter to review the effect of both allowing negative inputs to remain negative, and Relu for the simple reason that it doesn't activate all neurons at once allowing for faster computation. Leaky-Relu was considered for ???????. Softmax was used for our final layer because ?????
-<!-- This make sense? & FILL IN BLANKS -->
-We used L2 regularization on both layers to prevent overfitting of our training data.
-<!-- WHY L2? -->
-We implemented early stopping as an additional form of regularization to prevent overfitting and allow for faster computation. The target value was loss over accuracy to allow greater generalization onto our test set. We did not tune this parameter and patience was set to 20.  
-For optimization we used ADAM as theoretically it encorporates both momentum and stochastic gradient descent, thus outperforming both alone.  
-<!-- check -->
-For our loss function we naturally used classification cross-entropy loss.
-<!-- check -->
+
 Our hyperparameters were tuned for tuned for using grid-search, but due to computation issues stemming from the number of iterations the search had to perform we were only able to proceed half way through this tuning procedure. Discussion of the ranges tuned for each hypterparamter will be included in our experimentation section. 
 As for the scaling of our model, we believe given a larger data-set the model would have actually performed better. We had a relatively small feature space to run a neural net, and loss and accuracy may have improved given this was expanded. Performance of the multinomial logistic regression would not be expected to have changed, but the computation time would have significantly grown.
 
-
-<!-- What are the parameters / hyperparameters -->
-<!-- Not sure if I've mentioned them all -->
-
-<!-- How to optimize them -->
-
-<!-- how they control the complexity/flexibility of the algorithm -->
-<!-- I didn't really address this -->
-<!-- help -->
 
 
 # Section 2: Experiment
@@ -111,41 +108,16 @@ We first convert our regression problem into a classification problem by transfo
 
 We seperate our dataset into a 90:10 training-test split. The training is done on the 90% of the data with 20% as validation set and the best model fit is then performed on the test set to get the accuracy result. 
 
-The data is first scaled and centred before sending into the neural network for training and normalisation is performed before each dense layer. This normalisation is 
-necessary because it helps to speed up the converging process by normalising the extreme large value outputted from the previous layer. 
-
-
-Kauko[reference] has provided an overview on current neural network application for predicting house prices and introduced some advanced methods including self-organising map (SOM) and learning vector quantization (LVQ). However there is no pre-trained architecture for house price forecasting and thus we build our own two layer deep neural network from scratch. Based on the size of our data (48k observations with 277 features) and the project goal (classifying house price into 10 categories), it is not sensible to construct a neural network with more than 4 layers. Neural network with 3 layers may also work, but adding an additional layer increases the computational requirements for the tuning of a model that was already too heavy for our computers to handle. This is a possible extension of our study.
-
-```{r fig-architecture, fig.cap="Neural network architecture."}
-knitr::include_graphics("nn.png")
-```
+The data is first scaled and centred before sending into the neural network for training and normalisation is performed before each dense layer. This normalisation is necessary because it helps to speed up the converging process by normalising the extreme large value outputted from the previous layer. 
 
 We proceed by scaling and centering our data, transforming factors using one-hot encoding to increase feature space and allow our algorithm to improve in prediction, and we subset our data into sets of 90% training and 10% test.
 
-In running our model normalisation is performed before each dense layer. This normalisation is necessary because it helps to speed up the converging process by normalising the extreme large value outputted from the previous layer. 
+
+<!-- The optimisation used is ADAM. Different optimiser such as Root Mean Square Propagation (RMSPROP) or Random Gradient Descent (RGD) could be used for tuning but theoratically ADAM is believed to have better performance since it incorporates the momentum from RMSPROP to RGD The learning rate for ADAM is treated as a hyperparameter to tune.  -->
 
 
-
-
-1) relu function produces zero output for negative input, this would be helpful to avoid overfitting because a proportion of the features will be set to zeros. 
-
-2) unlike tanh function which will saturate at the asymptotic, which means the weight will not be updated much when the input neural has a large value, Relu functions will increase to infinity. This property of relu allows the relevant weight to be updated when the input gets larger. And the potential drawback of getting extremely large output is overcome through the aforementioned batch normalisation.
-
-The activation function for the final layer is softmax as this is the appropriate function for multi-level classification as it bounds probability ranges between 0-1, and the sum of probability for inclusion into each category will sum to 1. 
-
-To avoid overfitting of the data, several regularisation methods are used. Dropout rate is used before each dense layer. One thing to notice is that the dropout rate is added before the batch normalisation because otherwise the normalisation will be based on the full data while part of them will be dropped out before supplied to the next layer. Regularisation is also applied in each layer with learning rate being a hyper-parameter to tune. 
-
-Early stopping is also used to allow for more efficient updating on the parameter. We set max epochs at a large fixed value of 500 and use `patience = 20` for the early stopping in our network structure. This design allows the neural network to continue updating if needed while, not wasting computational power and time when the updates become slow.
-
-The optimisation used is ADAM. Different optimiser such as Root Mean Square Propagation (RMSPROP) or Random Gradient Descent (RGD) could be used for tuning but theoratically ADAM is believed to have better performance since it incorporates the momentum from RMSPROP to RGD The learning rate for ADAM is treated as a hyperparameter to tune. 
-
-The loss function used is the categorical cross entropy, which is the only option for multi-class classification.
-
+## Evaluation metric
 The metrics for evaluation is the loss function rather than the accuracy result. This design is chosen as the house prices in our data are not evenly distributed among all the categories. We can see from Figure \ref{fig:price-class}, price class 4 (ranging from (500k, 700k]) has the most number of observation falls into while very few observations belong to category 1 or 2. If accuracy measure is used for evaluating the algorithm, it will be prone to predicting category 4 or 5 to achieve a higher accuracy result while not learn the data well. Therefore loss function, which evaluates the performance of the algorithm based on its score on categorical cross entropy, is a more reliable measure for our use case. 
-
-<!-- optimization procedure -->
-<!-- how to select benchmark model -->
 
 
 ```{r price-class, fig.height=2}
@@ -157,13 +129,29 @@ house_c %>%
 ```
 
 
+## Optimization procedure 
+
 We considered three prominent gradient descent algorithms:
 
 1. RMSProp
 2. RGD with momentum
 3. Adaptive Moment Estimation (Adam)
 
-From these, we select Adam as it combines the strengths of RMSProp and momentum (Kingma, D et al). Adam stores an exponentially decaying average of past squared gradients like RMSprop, while also keeping an exponentially decaying average of past gradients, similar to momentum (Heusel, M et al). Whereas momentum can be seen as a ball running down a slope, Adam behaves like a heavy ball with friction, which prefers flat minima in the error surface.
+Adam is choosen as the optimiser for the project as it combines the strengths of RMSProp and momentum (Kingma, D et al). 
+
+In the optimisation procedure, we use `epoch = 500` and impose early stopping with `patience = 20` in our network structure. This design is chosen because it allows the algorithm to continue to update if necessary and a small epoch will force the algorithm to stop before it is fully updated. 
+
+Hyper-parameter tuning is utilised to find the best combination of parameters given the neurual network architecture defined. Due to the limitation of computational power, a small grid search is implemented with the grid value as shown in Table \ref{tab:hyper-para}. Dense unit starts from 256 as the largest because there are only 277 variable in our feature space. In this project, we dont consider the architecture of first expanding the feature space and then reducing it. Zero is included in the dropout rate is because a RELU activation function would output zeros if the input is negative. This feature of RELU function can be viewed as working as dropout rate. Batch size is also included in the tuning parameter. 
+
+```{r}
+kable(tibble(Hyperparameter = c("dense_unit1", "dense_unit2", 
+                                "dropout", "batch_size", "activation"),
+       Value = c("(256, 128)", "(128, 64, 32)", "(0,0.1, 0.2)", "(64, 128, 256, 512)", "(relu, tanh)")),
+       caption = "\\label{tab:hyper-para} The grid value of parameter used in hyperparameter tuning")
+```
+
+
+
 
 # Section 3: Results and Discussion
 
@@ -174,8 +162,8 @@ include_graphics("figure/best.png")
 ```
 
 ```{r best-para}
-kable(tibble(hyperparameter = c("dense_unit1", "dense_unit2", "dropout", "batch_size", "activation"),
-       value = c(256, 64, 0.2, 256, "relu")),caption = "\\label{tab:best-para}")
+kable(tibble(Hyperparameter = c("dense_unit1", "dense_unit2", "dropout", "batch_size", "activation"),
+       Value = c(256, 64, 0.2, 256, "relu")),caption = "\\label{tab:best-para} Best parameters")
 ```
 
 This model is then performed on the test set and the prediction matrix is presented in Table \ref{tab:pred-matrix-nn}. The accuracy of neural network algorithm is 50%. The multinomial logistic model is also performedon the test set and the accuracy is 51%. Associated prediction matrix is presented in Table \ref{tab:pred-matrix-mnl}. 

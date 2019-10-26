@@ -16,63 +16,8 @@ knitr::opts_chunk$set(warning = FALSE, message = FALSE,
   fig.align = "center", out.width = "80%", cache = FALSE)
 ```
 
-```{r load-library}
-library(readr)
-library(tidyverse)
-```
-
-
-```{r load-data}
-house <- read.csv(here::here("data","MELBOURNE_HOUSE_PRICES_LESS.csv"))
-house_full <- read.csv(here::here("data","Melbourne_housing_FULL.csv"))
-```
-
-```{r clean-data}
-# change variable names to lowercase
-names(house) <- tolower(names(house))
-names(house_full) <- tolower(names(house_full))
-```
-
-```{r split-data}
-## 70% of the sample size
-smp_size <- floor(0.7 * nrow(house))
-## set the seed to make your partition reproducible
-set.seed(123)
-train_ind <- sample(seq_len(nrow(house)), size = smp_size)
-train <- house[train_ind, ]
-test <- house[-train_ind, ]
-```
-
-
-```{r}
-library(rpart.plot)
-fit <- rpart(survived~., data = data_train, method = 'class')
-```
-
-
-```{r}
-#train %>% summary
-```
-
-```{r linear-model}
-mod1 <- glm(log(price) ~ rooms + type + postcode + distance, data=train, family = gaussian)
-pred_mod1 <- predict(mod1, test)
-
-
-```
-
-```{r random-forest}
-
-```
-
-
 # Section 1: Model  
 Model selection was born from discussion of our objectives, and consideration of our dataset.
-
-
-Y - Regression: Price (dollar amount)
-X - Input: 
-
 
 <!-- Learning problem -->
 <!-- Models considered -->
@@ -123,14 +68,17 @@ As for the scaling of our model, we believe given a larger data-set the model wo
 <!-- help -->
 
 
-
-
 # Section 2: Experiment
 
+## Data
 
-The dataset contains information on 63,013 house sales scraped from publicly available results posted every week from Domain.com.au. The dataset includes variables that detail the suburb, address, rooms, type of real estate, price, method of selling, seller, date, postcode, region, propertycount, distance from the CBD and council area. The dependent continuous variable, y, defines the sale price of the house in AUD. Further details about the data set as well as some preliminary analysis are included in Appendix.
+The dataset contains information on 63,013 house sales scraped from publicly available results posted every week from Domain.com.au. The dataset includes variables that detail the suburb, address, rooms, type of real estate, price, method of selling, seller, date, postcode, region, propertycount, distance from the CBD and council area. The dependent continuous variable, y, defines the sale price of the house in AUD. 
 
-We first divide the house price into 10 categories: (0, 100k], (100k, 300k], (300k, 500k] ... (1500k, 1700k], (1700k, $\infty$) and this allows us to perform neural network on a multi-class classification problem, which is much easier than prediction. 
+## Data Manipulation
+
+We first convert our regression problem into a classification problem by transforming house price into 10 categories: (0, 100k], (100k, 300k], (300k, 500k] ... (1500k, 1700k], (1700k, $\infty$) and this allows us to perform neural network on a multi-class classification problem, which is much easier than prediction. Our motivation for this is also because houses priced in the millions often have ___ characteristics that...
+
+We seperate our dataset into a 90:10 training-test split, and perform all of our model evaluations on the test set. 
 
 Kauko[reference] has provided an overview on current neural network application on predicting  house price and introduced some advanced methods like self-organising map(SOM) and learning vector quantization (LVQ). However, there is no pre-trained architecture for house price forecasting and thus, we build our own two layer deep neural network from scratch. Based on the size of our data (48k observations with 277 features) and the project goal (classifying house price into 10 categories), it is not sensible to construct a neural network with more than 4 layers. Although Neural network with 3 layers may also work, adding an additional means more parameter tuning and computing, which appears to be too complex for my computer lo. 
 
@@ -164,16 +112,33 @@ house_c %>%
 ```
 
 
+We considered three prominent gradient descent algorithms:
+
+1. RMSProp
+2. RGD with momentum
+3. Adaptive Moment Estimation (Adam)
+
+From these, we select Adam as it combines the strengths of RMSProp and momentum (Kingma, D et al). Adam stores an exponentially decaying average of past squared gradients like RMSprop, while also keeping an exponentially decaying average of past gradients, similar to momentum (Heusel, M et al). Whereas momentum can be seen as a ball running down a slope, Adam behaves like a heavy ball with friction, which prefers flat minima in the error surface.
+
 
 
 
 # Section 3: Results and Discussion
 This includes for example graphs and tables, as well as a discussion of the results. You should also present your model fitting, diagnostics, etc.
 
-this is jack's first pull request
-
 # Section 4: Conclusion
+
 This includes a summary of the findings.
+
+Residential versus commerical buildings 
+
 
 # Appendix
 
+# References
+
+Sebastian Ruder (2016). An overview of gradient descent optimisation algorithms. arXiv preprint arXiv:1609.04747.
+
+Kingma, D. P., & Ba, J. L. (2015). Adam: a Method for Stochastic Optimization. International Conference on Learning Representations, 1–13.
+
+Heusel, M., Ramsauer, H., Unterthiner, T., Nessler, B., & Hochreiter, S. (2017). GANs Trained by a Two Time-Scale Update Rule Converge to a Local Nash Equilibrium. In Advances in Neural Information Processing Systems 30 (NIPS 2017).

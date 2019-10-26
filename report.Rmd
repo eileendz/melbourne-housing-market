@@ -91,7 +91,7 @@ We proceed by scaling and centering our data, transforming factors using one-hot
 
 The metrics for evaluation is the loss function rather than the accuracy result. This design is chosen as the house prices in our data are not evenly distributed among all the categories. We can see from Figure \ref{fig:price-class}, price class 4 (ranging from (500k, 700k]) has the most number of observation falls into while very few observations belong to category 1 or 2. If accuracy measure is used for evaluating the algorithm, it will be prone to predicting category 4 or 5 to achieve a higher accuracy result while not learn the data well. Therefore loss function, which evaluates the performance of the algorithm based on its score on categorical cross entropy, is a more reliable measure for our use case. 
 
-```{r price-class, fig.height=2}
+```{r price-class, fig.height=2, fig.cap="Price class"}
 load("data/house_c.rda")
 house_c %>% 
   ggplot(aes(x = price_class)) + 

@@ -112,7 +112,7 @@ We first convert our regression problem into a classification problem by transfo
 
 We seperate our dataset into a 90:10 training-test split. The training is done on the 90% of the data with 20% as validation set and the best model fit is then performed on the test set to get the accuracy result. 
 
-
+ 
 The data is first scaled and centred before sending into the neural network for training and normalisation is performed before each dense layer. This normalisation is 
 necessary because it helps to speed up the converging process by normalising the extreme large value outputted from the previous layer. 
 

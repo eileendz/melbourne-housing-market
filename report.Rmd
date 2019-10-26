@@ -2,7 +2,7 @@
 title: "ETC3555 Melbourne housing market: Price modelling"
 author: "Jack Cameron, Eileen Dzhumasheva, Huize Zhang"
 output: pdf_document
-geometry: margin=2cm
+geometry: margin=1.5cm
 ---
 
 # Introduction
@@ -31,7 +31,9 @@ Model selection was born from discussion of our objectives, and consideration of
 <!-- how they control the complexity/flexibility of the algorithm -->
 <!-- does the method scale with large data sets, etc -->
 
+
 For the problem of predicting house prices for private sales, a theoretical unknown target function exists, but we don't believe any practical target function exists. The simple rationale is that private sales are too heavily dependent on subjective characteristics of how the buyer buys, and how the seller sells, to be accurately approximated in any qualitative or quantitative sense. With this said, our unknown target distribution is therefore the best approximation to such an issue. In considering the modelling approach to take, we reflected on the real world application of such a tool. Presently, when houses are put up for sale they list with an expected range. Similarly, when houses are bid upon, they are done so with nominal amounts of money, such as $10,000 increments. Given such use cases it seems misguided to attempt to price a house at an exact dollar figure, and more sensible to attempt to classify house prices into ranges of prices. After narrowing down our approach, we consider a neural net for the purpose of this project, and an appropriate benchmark model reflecting our need.  
+
 
 For the benchmark we considered the following models  
 
@@ -42,19 +44,19 @@ For the benchmark we considered the following models
 
 OLS regression was ruled out for it's distributional assumptions which did not fit our dataset, and the desire to choose a model with inherent classification abilities. Naive Bayes was considered for it's ease of implementation and understanding, but ruled out for preference of a more complex model. The choice ultimately came down to random forests and multi-class, or multi-nomial logistic regression. The latter was chosen for it's relatively simple implementation, computational speed, and well documented success in multi-class classification. 
 
+For our neural network, the classification approach simplified things as we were familiar with its implementation from the lecture and tutorial material. The structure and considerations will now be introduced.  
 
-For our neural net, the classification approach simplified things as we were familiar with its implementation from the lecture and tutorial material. The structure and considerations will now be introduced.  
-
-Kauko (2003) has provided an overview on current neural network application on predicting  house price and introduced some advanced methods like self-organising map(SOM) and learning vector quantization (LVQ). However, there is no pre-trained architecture for house price forecasting and thus, we build our own two layer deep neural network from scratch. Due to the size of the data (48k observations with 277 features), the architecture is a deep neural network with two hidden layer. A graphic illustration of the architecture is shown in Figure \ref{fig:architecture}. A three hidden layer architecture is also considered but due to the extra computational burden associated with training and hyperparameter training, it is not implemented in this project. 
-
+Kauko (2003) has provided an overview on current neural network application on predicting house price and introduced some advanced methods like self-organising map(SOM) and learning vector quantization (LVQ). However, there is no pre-trained architecture for house price forecasting and thus, we build our own two layer deep neural network from scratch. Due to the size of the data (48k observations with 277 features), the architecture is a deep neural network with two hidden layer. A graphic illustration of the architecture is shown in Figure \ref{fig:architecture}. A three hidden layer architecture is also considered but due to the extra computational burden associated with training and hyperparameter training, it is not implemented in this project. 
 
 ```{r architecture, fig.cap="Neural network architecture."}
 knitr::include_graphics("nn.png")
 ```
 
+
 Two activation functions, Relu and Tanh are chosen to tune for the middle layers. Relu has its advantage of outputting zeros for negative input, which would be helpful to avoid overfitting. Also, Relu function will increase to infinity at asymptotic and this property allows the relevant weight to be fully updated when the input gets larger. Tanh is also considered because it is  an symmetric activation function that will provide symmetric result for positive and negative inputs (thus don't need normalisation) but unlike relu function, it saturates at asymptotic, which may cause large inputs not being able to get updated. The activation function for the final layer is softmax as this is the appropriate function for multi-level classification as it bounds probability ranges between 0-1, and the sum of probability for inclusion into each category will sum to 1. 
 
 To avoid overfitting of the data, dropout and l2 regularisation are used. Dropout rate is used before each dense layer and is a tuning parameter in the grid serach. L2 regularisation is also applied in each layer to avoid overfitting and a learning rate of 1e-3 is used. 
+
 
 Batch normalisation is also performed before each dense layer. This process is necessary because it will normalise the extreme large values from the previous layer so that the training process can speed up. Batch normalisation is added after the dropout layer since it makes more sense to only normalise the neurals that will be supplied into the next layer. 
 
@@ -63,9 +65,8 @@ The loss function used is the categorical cross entropy, which is the only optio
 
 Our hyperparameters were tuned using grid-search, but due to computation issues stemming from the number of iterations the search had to perform we were only able to proceed half way through this tuning procedure. Discussion of the ranges tuned for each hypterparamter will be included in our experimentation section. 
 
+
 As for the scaling of our model, we believe given a larger data-set the model would have actually performed better. We had a relatively small feature space to run a neural net, and loss and accuracy may have improved given this was expanded. Performance of the multinomial logistic regression would not be expected to have changed, but the computation time would have significantly grown.
-
-
 
 # Section 2: Experiment
 
@@ -85,13 +86,11 @@ The data is first scaled and centred before sending into the neural network for 
 
 We proceed by scaling and centering our data, transforming factors using one-hot encoding to increase feature space and allow our algorithm to improve in prediction, and we subset our data into sets of 90% training and 10% test.
 
-
 <!-- The optimisation used is ADAM. Different optimiser such as Root Mean Square Propagation (RMSPROP) or Random Gradient Descent (RGD) could be used for tuning but theoratically ADAM is believed to have better performance since it incorporates the momentum from RMSPROP to RGD The learning rate for ADAM is treated as a hyperparameter to tune.  -->
 
-
 ## Evaluation metric
-The metrics for evaluation is the loss function rather than the accuracy result. This design is chosen as the house prices in our data are not evenly distributed among all the categories. We can see from Figure \ref{fig:price-class}, price class 4 (ranging from (500k, 700k]) has the most number of observation falls into while very few observations belong to category 1 or 2. If accuracy measure is used for evaluating the algorithm, it will be prone to predicting category 4 or 5 to achieve a higher accuracy result while not learn the data well. Therefore loss function, which evaluates the performance of the algorithm based on its score on categorical cross entropy, is a more reliable measure for our use case. 
 
+The metrics for evaluation is the loss function rather than the accuracy result. This design is chosen as the house prices in our data are not evenly distributed among all the categories. We can see from Figure \ref{fig:price-class}, price class 4 (ranging from (500k, 700k]) has the most number of observation falls into while very few observations belong to category 1 or 2. If accuracy measure is used for evaluating the algorithm, it will be prone to predicting category 4 or 5 to achieve a higher accuracy result while not learn the data well. Therefore loss function, which evaluates the performance of the algorithm based on its score on categorical cross entropy, is a more reliable measure for our use case. 
 
 ```{r price-class, fig.height=2}
 load("data/house_c.rda")
@@ -100,7 +99,6 @@ house_c %>%
   geom_histogram() +
   scale_x_continuous(breaks = seq(1, 10,1))
 ```
-
 
 ## Optimization procedure 
 
@@ -137,7 +135,7 @@ kable(tibble(Hyperparameter = c("dense_unit1", "dense_unit2", "dropout", "batch_
        Value = c(256, 64, 0.2, 256, "relu")),caption = "\\label{tab:best-para} Best parameters")
 ```
 
-This model is then performed on the test set and the prediction matrix is presented in Table \ref{tab:pred-matrix-nn}. The accuracy of neural network algorithm is 50%. The multinomial logistic model is also performedon the test set and the accuracy is 51%. Associated prediction matrix is presented in Table \ref{tab:pred-matrix-mnl}. 
+This model is then performed on the test set and the prediction matrix is presented in Table \ref(tab:pred-matrix-nn). The accuracy of neural network algorithm is 50%. The multinomial logistic model is also performedon the test set and the accuracy is 51%. Associated prediction matrix is presented in Table \ref(tab:pred-matrix-mnl). 
 
 ```{r pred-matrix-nn}
 load("data/pred_nn")
@@ -152,16 +150,11 @@ The neural network is not competitive as the multinomial logistic model from our
 
 The second reason is due to the limitation of computation power. There are still some parameters we are keeping constant through the hyperparameter tuning, for example, learning rate. There are also more activation function such as LeakyRELU that we could try to see if better performance can be achieved. 
 
-
-
-
 # Section 4: Conclusion
 
 A random guess in our classification would have been 10%. Our neural network performed with a 50.51% accuracy in classifying house prices into the 10 categories of ranges. The mulitnomial logistic regression performed with a 51.27% accuracy.  
 Our network accuracy may have increased if we had the time to allow for a full set of hyperparameter tuning, yet we were also limited by the small feature space in our data. The latter could have been overcome by utilising the variable for seller denoting the agency, and also by utilising the full dataset rather than the reduced as mentioned in our experiment section.  
 A key takeaway from this project is that neural networks are most useful in datasets with significant feature space, for their ability to transform and make use of the optimum combination of features.  
-
-Residential versus commerical buildings 
 
 # References
 

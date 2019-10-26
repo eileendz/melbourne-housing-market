@@ -4,6 +4,7 @@ subtitle: "ETC3555: Report"
 author: "Jack Cameron, Eileen Dzhumasheva, Huize Zhang"
 date: "14/10/2019"
 output: pdf_document
+geometry: margin=2cm
 ---
 
 # Introduction
